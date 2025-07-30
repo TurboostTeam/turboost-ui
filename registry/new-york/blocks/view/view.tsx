@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDownIcon, PlusIcon } from "lucide-react";
+import { ChevronDownIcon, PlusIcon, Loader2 } from "lucide-react";
 import { type ReactElement, useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -30,7 +30,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/registry/new-york/ui/form";
-import { Loading } from "@/registry/new-york/blocks/loading/loading";
 
 interface ViewFormData {
   name: string;
@@ -267,7 +266,7 @@ export function View({
                 <DialogFooter>
                   <Button type="submit" disabled={loading}>
                     {loading ? (
-                      <Loading />
+                      <Loader2 className="animate-spin" />
                     ) : (
                       translate(
                         "turboost_ui.view.create_view_dialog.form.submit_btn.content"
@@ -326,7 +325,7 @@ export function View({
               <DialogFooter>
                 <Button type="submit" disabled={loading}>
                   {loading ? (
-                    <Loading />
+                    <Loader2 className="animate-spin" />
                   ) : (
                     translate(
                       "turboost_ui.view.rename_view_dialog.form.submit_btn.content"
@@ -366,7 +365,7 @@ export function View({
               onClick={handleDeleteView}
             >
               {loading ? (
-                <Loading />
+                <Loader2 className="animate-spin" />
               ) : (
                 translate(
                   "turboost_ui.view.delete_view_dialog.delete_btn.content"

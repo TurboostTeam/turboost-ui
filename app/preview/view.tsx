@@ -47,6 +47,7 @@ export const ViewPreview = () => {
 
   return (
     <View
+      loading
       canAdd
       items={views}
       onActiveChange={(key) => {
