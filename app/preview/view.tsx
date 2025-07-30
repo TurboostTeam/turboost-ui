@@ -10,6 +10,11 @@ import { useCallback, useState } from "react";
 export const ViewPreview = () => {
   const [views, setViews] = useState<ViewItem[]>([
     {
+      key: "view0",
+      label: "不可操作",
+      canEdit: false,
+    },
+    {
       key: "view1",
       label: "View 1",
     },
@@ -47,7 +52,6 @@ export const ViewPreview = () => {
 
   return (
     <View
-      loading
       canAdd
       items={views}
       onActiveChange={(key) => {
