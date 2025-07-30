@@ -168,7 +168,7 @@ export function View({
         </DropdownMenu>
       );
     },
-    [setDeleteViewDialogOpen, translate]
+    [setDeleteViewDialogOpen, setRenameViewDialogOpen, translate]
   );
 
   return (
