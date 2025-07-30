@@ -17,7 +17,7 @@ export default function Home() {
 
   return (
     <Tabs
-      defaultValue={components[0].name}
+      defaultValue={components[0]?.name}
       className="w-full h-full p-4 flex gap-4 items-center"
     >
       <div className="w-fit space-y-2">
