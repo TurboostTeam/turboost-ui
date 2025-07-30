@@ -1,0 +1,7 @@
+import { TagsInputPreview } from "./tags-input";
+import { ViewPreview } from "./view";
+
+export const components = [
+  { name: "Tags Input", type: "表单", content: <TagsInputPreview /> },
+  { name: "View", type: "视图", content: <ViewPreview /> },
+];

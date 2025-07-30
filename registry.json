@@ -17,6 +17,27 @@
           "target": "components/turboost-ui/tags-input/tags-input.tsx"
         }
       ]
+    },
+    {
+      "name": "view",
+      "type": "registry:component",
+      "title": "View",
+      "description": "A view component",
+      "dependencies": ["lucide-react", "react-hook-form"],
+      "registryDependencies": [
+        "button",
+        "dialog",
+        "input",
+        "form",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/blocks/view/view.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/view/view.tsx"
+        }
+      ]
     }
   ]
 }
