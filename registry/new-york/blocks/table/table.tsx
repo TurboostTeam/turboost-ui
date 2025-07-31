@@ -308,10 +308,10 @@ export function Table<T>({
                   <td className="text-sm text-gray-500">
                     {isRowSelectedAll
                       ? translate(
-                          "common:components.table.batchActions.selectedAll"
+                          "turboost_ui.table.batch_actions.selected_all"
                         ) ?? "Selected all"
                       : translate(
-                          "common:components.table.batchActions.selectedRows",
+                          "turboost_ui.table.batch_actions.selected_rows",
                           {
                             rows: Object.keys(internalRowSelection).length,
                           }
@@ -342,10 +342,10 @@ export function Table<T>({
                         >
                           {isRowSelectedAll
                             ? translate(
-                                "common:components.table.batchActions.cancel"
+                                "turboost_ui.table.batch_actions.cancel"
                               ) ?? "Cancel"
                             : translate(
-                                "common:components.table.batchActions.selectAll"
+                                "turboost_ui.table.batch_actions.select_all"
                               ) ?? "Select all"}
                         </Button>
                       </td>
