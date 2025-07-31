@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "table",
-  "type": "registry:component",
+  "type": "registry:block",
   "title": "Table",
   "description": "A table component",
   "dependencies": [
