@@ -38,6 +38,40 @@
           "target": "components/turboost-ui/view/view.tsx"
         }
       ]
+    },
+    {
+      "name": "table",
+      "type": "registry:component",
+      "title": "Table",
+      "description": "A table component",
+      "dependencies": ["lucide-react", "@tanstack/react-table", "lodash"],
+      "registryDependencies": ["button", "checkbox", "radio-group"],
+      "files": [
+        {
+          "path": "registry/new-york/blocks/empty-state/empty-state.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/empty-state/empty-state.tsx"
+        },
+        {
+          "path": "registry/new-york/blocks/table/table.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/table/table.tsx"
+        }
+      ]
+    },
+    {
+      "name": "empty-state",
+      "type": "registry:component",
+      "title": "Empty State",
+      "description": "A empty state component",
+      "dependencies": ["lucide-react"],
+      "files": [
+        {
+          "path": "registry/new-york/blocks/empty-state/empty-state.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/empty-state/empty-state.tsx"
+        }
+      ]
     }
   ]
 }
