@@ -102,6 +102,19 @@
           "target": "components/turboost-ui/filter/utils/transform-object-by-fields.ts"
         }
       ]
+    },
+    {
+      "name": "input",
+      "type": "registry:component",
+      "title": "Input",
+      "description": "A input component",
+      "files": [
+        {
+          "path": "registry/new-york/blocks/input/input.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/input/input.tsx"
+        }
+      ]
     }
   ]
 }
