@@ -95,6 +95,11 @@
           "path": "registry/new-york/types/field.type.ts",
           "type": "registry:file",
           "target": "components/turboost-ui/types/field.type.ts"
+        },
+        {
+          "path": "registry/new-york/blocks/filter/utils/transform-object-by-fields.ts",
+          "type": "registry:file",
+          "target": "components/turboost-ui/filter/utils/transform-object-by-fields.ts"
         }
       ]
     }

@@ -33,6 +33,12 @@
       "content": "type Prev = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];\n\ntype Join<K, P> = K extends string | number\n  ? P extends string | number\n    ? `${K}${\"\" extends P ? \"\" : \".\"}${P}`\n    : never\n  : never;\n\nexport type Field<T, D extends Prev[number] = 3> = [D] extends [never]\n  ? never\n  : T extends object\n  ? {\n      [K in keyof T]-?: K extends string | number\n        ? T[K] extends Date\n          ? `${K}`\n          : Join<K, Field<T[K], Prev[D]>>\n        : never;\n    }[keyof T]\n  : \"\";\n",
       "type": "registry:file",
       "target": "components/turboost-ui/types/field.type.ts"
+    },
+    {
+      "path": "registry/new-york/blocks/filter/utils/transform-object-by-fields.ts",
+      "content": "import { FilterItemProps } from \"../filter\";\n\nexport type TypeValue =\n  | StringConstructor\n  | NumberConstructor\n  | BooleanConstructor\n  | DateConstructor\n  | ArrayConstructor;\n\nexport const transformTypeValue = (\n  value: any,\n  type?: TypeValue,\n  itemType?: TypeValue,\n): any => {\n  if (typeof type === \"undefined\") {\n    return value;\n  }\n\n  try {\n    switch (type) {\n      case String:\n        return String(value);\n      case Number:\n        return Number(value);\n      case Boolean:\n        return Boolean(value);\n      case Date:\n        return new Date(value);\n      case Array:\n        if (Array.isArray(value)) {\n          return typeof itemType !== \"undefined\"\n            ? value.map((item: any) => transformTypeValue(item, itemType))\n            : value;\n        } else if (value !== null && typeof value !== \"undefined\") {\n          return typeof itemType !== \"undefined\"\n            ? [transformTypeValue(value, itemType)]\n            : [value];\n        } else {\n          return [];\n        }\n      default:\n        return value;\n    }\n  } catch {\n    return value;\n  }\n};\n\nexport const transformObjectByFields = (\n  obj: Record<string, any>,\n  filters: FilterItemProps<any>[],\n): Record<string, any> => {\n  const result: Record<string, any> = {};\n\n  for (const key of Object.keys(obj)) {\n    const filter = filters.find((f) => f.field === key);\n\n    if (filter) {\n      result[key] = transformTypeValue(obj[key], filter.type, filter.itemType);\n    } else {\n      result[key] = obj[key];\n    }\n  }\n\n  return result;\n};\n",
+      "type": "registry:file",
+      "target": "components/turboost-ui/filter/utils/transform-object-by-fields.ts"
     }
   ]
 }
