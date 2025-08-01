@@ -182,6 +182,11 @@
           "path": "registry/new-york/blocks/index-table/order-direction-list.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/index-table/order-direction-list.tsx"
+        },
+        {
+          "path": "registry/new-york/blocks/index-table/index-table.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/index-table/index-table.tsx"
         }
       ]
     }
