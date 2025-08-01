@@ -129,8 +129,7 @@
         "radio-group",
         "tooltip",
         "dialog",
-        "form",
-        "input"
+        "form"
       ],
       "files": [
         {

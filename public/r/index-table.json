@@ -17,8 +17,7 @@
     "radio-group",
     "tooltip",
     "dialog",
-    "form",
-    "input"
+    "form"
   ],
   "files": [
     {
@@ -29,7 +28,7 @@
     },
     {
       "path": "registry/new-york/blocks/index-table/types/index-table.ts",
-      "content": "import { type OrderDirection } from \"./order-direction\";\n\nexport interface IndexTableOrder<OrderField> {\n  field: OrderField;\n  direction: OrderDirection;\n}\n\nexport interface IndexTableEdge<Node> {\n  node: Node;\n  cursor: string;\n}\n\nexport interface IndexTablePageInfo {\n  endCursor?: string | null;\n  hasNextPage: boolean;\n  hasPreviousPage: boolean;\n  startCursor?: string | null;\n}\n\nexport interface IndexTablePagination {\n  first?: number;\n  last?: number;\n  before?: string | null;\n  after?: string | null;\n}\n\nexport interface IndexTableValue<OrderField> extends IndexTablePagination {\n  query?: string;\n  orderBy?: IndexTableOrder<OrderField>;\n}\n",
+      "content": "import { type OrderDirection } from \"@/registry/new-york/blocks/index-table/types/order-direction\";\n\nexport interface IndexTableOrder<OrderField> {\n  field: OrderField;\n  direction: OrderDirection;\n}\n\nexport interface IndexTableEdge<Node> {\n  node: Node;\n  cursor: string;\n}\n\nexport interface IndexTablePageInfo {\n  endCursor?: string | null;\n  hasNextPage: boolean;\n  hasPreviousPage: boolean;\n  startCursor?: string | null;\n}\n\nexport interface IndexTablePagination {\n  first?: number;\n  last?: number;\n  before?: string | null;\n  after?: string | null;\n}\n\nexport interface IndexTableValue<OrderField> extends IndexTablePagination {\n  query?: string;\n  orderBy?: IndexTableOrder<OrderField>;\n}\n",
       "type": "registry:file",
       "target": "components/turboost-ui/index-table/types/index-table.ts"
     },
