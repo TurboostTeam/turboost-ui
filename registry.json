@@ -138,16 +138,6 @@
           "target": "components/turboost-ui/types/field.ts"
         },
         {
-          "path": "registry/new-york/blocks/index-table/types/index-table.ts",
-          "type": "registry:file",
-          "target": "components/turboost-ui/index-table/types/index-table.ts"
-        },
-        {
-          "path": "registry/new-york/blocks/index-table/types/order-direction.ts",
-          "type": "registry:file",
-          "target": "components/turboost-ui/index-table/types/order-direction.ts"
-        },
-        {
           "path": "registry/new-york/blocks/index-table/utils/build-graphql-query-from-filter-values.ts",
           "type": "registry:file",
           "target": "components/turboost-ui/index-table/utils/build-graphql-query-from-filter-values.ts"

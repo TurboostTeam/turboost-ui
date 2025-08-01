@@ -4,7 +4,10 @@ import { cn } from "@/lib/utils";
 
 import { Button } from "@/registry/new-york/ui/button";
 
-import { OrderDirection } from "@/registry/new-york/blocks/index-table/types/order-direction";
+export enum OrderDirection {
+  ASC = "ASC",
+  DESC = "DESC",
+}
 
 export interface OrderDirectionListProps {
   className?: string;

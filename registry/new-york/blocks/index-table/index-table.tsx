@@ -90,41 +90,39 @@ import {
 } from "@/registry/new-york/ui/form";
 import { Input } from "@/registry/new-york/blocks/input/input";
 import { OrderDirectionList } from "@/registry/new-york/blocks/index-table/order-direction-list";
-import {
-  type IndexTableEdge,
-  type IndexTablePageInfo,
-  type IndexTablePagination,
-  type IndexTableValue,
-} from "@/registry/new-york/blocks/index-table/types/index-table";
-import { OrderDirection } from "@/registry/new-york/blocks/index-table/types/order-direction";
+
+import { OrderDirection } from "@/registry/new-york/blocks/index-table/order-direction-list";
 import { buildGraphqlQueryFromFilterValues } from "@/registry/new-york/blocks/index-table/utils/build-graphql-query-from-filter-values";
 import { cn } from "@/lib/utils";
 
-const getFilterFiledTypeParse = (
-  type: FilterTypeValue,
-  itemType?: FilterTypeValue
-): ParserBuilder<any> => {
-  switch (type) {
-    case String:
-      return parseAsString;
-    case Number:
-      return parseAsInteger;
-    case Boolean:
-      return parseAsBoolean;
-    case Date:
-      return parseAsIsoDateTime;
-    case Array:
-      return parseAsArrayOf(
-        typeof itemType === "undefined"
-          ? parseAsString
-          : itemType === Date
-          ? (parseAsIsoDateTime as unknown as ParserBuilder<string>)
-          : getFilterFiledTypeParse(itemType)
-      );
-    default:
-      return parseAsString;
-  }
-};
+export interface IndexTableOrder<OrderField> {
+  field: OrderField;
+  direction: OrderDirection;
+}
+
+export interface IndexTableEdge<Node> {
+  node: Node;
+  cursor: string;
+}
+
+export interface IndexTablePageInfo {
+  endCursor?: string | null;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor?: string | null;
+}
+
+export interface IndexTablePagination {
+  first?: number;
+  last?: number;
+  before?: string | null;
+  after?: string | null;
+}
+
+export interface IndexTableValue<OrderField> extends IndexTablePagination {
+  query?: string;
+  orderBy?: IndexTableOrder<OrderField>;
+}
 
 export interface SaveViewConfig {
   filters?: Record<string, any>;
@@ -183,6 +181,32 @@ export interface IndexTableProps<Node, OrderField> {
   onRow?: TableProps<Node>["onRow"];
   t?: Function;
 }
+
+const getFilterFiledTypeParse = (
+  type: FilterTypeValue,
+  itemType?: FilterTypeValue
+): ParserBuilder<any> => {
+  switch (type) {
+    case String:
+      return parseAsString;
+    case Number:
+      return parseAsInteger;
+    case Boolean:
+      return parseAsBoolean;
+    case Date:
+      return parseAsIsoDateTime;
+    case Array:
+      return parseAsArrayOf(
+        typeof itemType === "undefined"
+          ? parseAsString
+          : itemType === Date
+          ? (parseAsIsoDateTime as unknown as ParserBuilder<string>)
+          : getFilterFiledTypeParse(itemType)
+      );
+    default:
+      return parseAsString;
+  }
+};
 
 export function IndexTable<Node, OrderField extends string>({
   emptyStateIcon,
