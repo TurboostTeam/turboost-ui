@@ -815,7 +815,7 @@ export function IndexTable<Node, OrderField extends string>({
                     <Loader2 className="animate-spin" />
                   ) : (
                     translate(
-                      "turboost_ui.index_table.view.create_dialog.form.submit_btn"
+                      "turboost_ui.index_table.view.create_dialog.form.submit_btn.content"
                     ) ?? "Save"
                   )}
                 </Button>
