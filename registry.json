@@ -115,6 +115,75 @@
           "target": "components/turboost-ui/input/input.tsx"
         }
       ]
+    },
+    {
+      "name": "index-table",
+      "type": "registry:block",
+      "title": "Index Table",
+      "description": "A index table component",
+      "dependencies": ["lodash", "lucide-react", "nuqs", "react-hook-form"],
+      "registryDependencies": [
+        "button",
+        "label",
+        "popover",
+        "radio-group",
+        "tooltip",
+        "dialog",
+        "form",
+        "input"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/types/field.ts",
+          "type": "registry:file",
+          "target": "components/turboost-ui/types/field.ts"
+        },
+        {
+          "path": "registry/new-york/blocks/index-table/types/index-table.ts",
+          "type": "registry:file",
+          "target": "components/turboost-ui/index-table/types/index-table.ts"
+        },
+        {
+          "path": "registry/new-york/blocks/index-table/types/order-direction.ts",
+          "type": "registry:file",
+          "target": "components/turboost-ui/index-table/types/order-direction.ts"
+        },
+        {
+          "path": "registry/new-york/blocks/index-table/utils/build-graphql-query-from-filter-values.ts",
+          "type": "registry:file",
+          "target": "components/turboost-ui/index-table/utils/build-graphql-query-from-filter-values.ts"
+        },
+        {
+          "path": "registry/new-york/blocks/filter/filter.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/filter/filter.tsx"
+        },
+        {
+          "path": "registry/new-york/blocks/table/table.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/table/table.tsx"
+        },
+        {
+          "path": "registry/new-york/blocks/view/view.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/view/view.tsx"
+        },
+        {
+          "path": "registry/new-york/blocks/empty-state/empty-state.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/empty-state/empty-state.tsx"
+        },
+        {
+          "path": "registry/new-york/blocks/input/input.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/input/input.tsx"
+        },
+        {
+          "path": "registry/new-york/blocks/index-table/order-direction-list.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/index-table/order-direction-list.tsx"
+        }
+      ]
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { FilterPreview } from "./filter";
+import IndexTablePreview from "./index-table";
 import { InputPreview } from "./input";
 import { TablePreview } from "./table";
 import { TagsInputPreview } from "./tags-input";
@@ -10,4 +11,5 @@ export const components = [
   { name: "View", type: "视图", content: <ViewPreview /> },
   { name: "Table", type: "视图", content: <TablePreview /> },
   { name: "Filter", type: "视图", content: <FilterPreview /> },
+  { name: "Index Table", type: "视图", content: <IndexTablePreview /> },
 ];
