@@ -143,6 +143,11 @@
           "target": "components/turboost-ui/index-table/utils/build-graphql-query-from-filter-values.ts"
         },
         {
+          "path": "registry/new-york/blocks/filter/utils/transform-object-by-fields.ts",
+          "type": "registry:file",
+          "target": "components/turboost-ui/filter/utils/transform-object-by-fields.ts"
+        },
+        {
           "path": "registry/new-york/blocks/filter/filter.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/filter/filter.tsx"
