@@ -9,6 +9,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { cloneDeep, groupBy, reduce, sum } from "lodash";
+import { Loader2 } from "lucide-react";
 import {
   type ReactElement,
   type RefObject,
@@ -18,7 +19,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { cn } from "@/lib/utils";
 
 import {
   EmptyState,
@@ -27,7 +27,7 @@ import {
 import { Button } from "@/registry/new-york/ui/button";
 import { Checkbox } from "@/registry/new-york/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/registry/new-york/ui/radio-group";
-import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const columnAlignClass = {
   left: "text-left",
@@ -285,7 +285,7 @@ export function Table<T>({
             {!(rowSelection?.single ?? false) &&
               Object.keys(internalRowSelection).length > 0 &&
               hasBulkActions && (
-                <tr className="absolute z-[2] flex w-full items-center space-x-2 bg-white px-3 py-2">
+                <tr className="bg-background absolute z-[2] flex w-full items-center space-x-2 px-3 py-2">
                   <td>
                     <Checkbox
                       checked={
@@ -305,7 +305,7 @@ export function Table<T>({
                     />
                   </td>
 
-                  <td className="text-sm text-gray-500">
+                  <td className="text-foreground text-sm">
                     {isRowSelectedAll
                       ? translate(
                           "turboost_ui.table.batch_actions.selected_all"
@@ -379,7 +379,7 @@ export function Table<T>({
                   return (
                     <th
                       className={cn(
-                        "bg-white px-3 py-3.5 text-left text-sm font-semibold whitespace-nowrap",
+                        "bg-background px-3 py-3.5 text-left text-sm font-semibold whitespace-nowrap",
                         typeof (header.column.columnDef as TableColumnProps<T>)
                           ?.align !== "undefined" &&
                           columnAlignClass[
@@ -392,8 +392,7 @@ export function Table<T>({
                             (header.column.columnDef as TableColumnProps<T>)
                               .wordWrap as unknown as keyof typeof columnWrapClass
                           ],
-                        header.column.getIsPinned() !== false &&
-                          "sticky z-[1] bg-white",
+                        header.column.getIsPinned() !== false && "sticky z-[1]",
                         header.column.getIsPinned() === "left" &&
                           header.column.getPinnedIndex() ===
                             table.getLeftLeafColumns().length - 1 &&
@@ -468,11 +467,11 @@ export function Table<T>({
         }}
       >
         <table className="w-full table-fixed">
-          <tbody className="relative divide-y divide-gray-200">
+          <tbody className="divide-border relative divide-y">
             {table.getRowModel().rows.map((row) => (
               <tr
                 className={cn(
-                  "group bg-white hover:bg-gray-50",
+                  "group bg-background",
                   onRow != null && "cursor-pointer"
                 )}
                 key={row.id}
@@ -483,7 +482,7 @@ export function Table<T>({
                 {row.getVisibleCells().map((cell) => (
                   <td
                     className={cn(
-                      "bg-white px-3 py-4 text-sm break-words text-gray-500 group-hover:bg-gray-50",
+                      "text-foreground group-hover:bg-muted bg-background px-3 py-4 text-sm break-words",
                       typeof (cell.column.columnDef as TableColumnProps<T>)
                         ?.align !== "undefined" &&
                         columnAlignClass[
@@ -555,7 +554,7 @@ export function Table<T>({
                   {footerGroup.headers.map((header) => (
                     <th
                       className={cn(
-                        "bg-white px-3 py-4 text-sm break-words text-gray-500",
+                        "text-foreground bg-background px-3 py-4 text-sm break-words",
                         typeof (header.column.columnDef as TableColumnProps<T>)
                           ?.align !== "undefined"
                           ? columnAlignClass[
@@ -569,8 +568,7 @@ export function Table<T>({
                             (header.column.columnDef as TableColumnProps<T>)
                               .wordWrap as unknown as keyof typeof columnWrapClass
                           ],
-                        header.column.getIsPinned() !== false &&
-                          "sticky z-[1] bg-white",
+                        header.column.getIsPinned() !== false && "sticky z-[1]",
                         header.column.getIsPinned() === "left" &&
                           header.column.getPinnedIndex() ===
                             table.getLeftLeafColumns().length - 1 &&
