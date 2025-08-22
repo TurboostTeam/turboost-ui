@@ -42,37 +42,28 @@ import {
 import { useForm } from "react-hook-form";
 
 import {
+  EmptyState,
+  EmptyStateProps,
+} from "@/registry/new-york/blocks/empty-state/empty-state";
+import {
   Filter,
   type FilterItemProps,
   type FilterSearchConfig,
   FilterTypeValue,
 } from "@/registry/new-york/blocks/filter/filter";
+import { OrderDirectionList } from "@/registry/new-york/blocks/index-table/order-direction-list";
+import { OrderDirection } from "@/registry/new-york/blocks/index-table/order-direction-list";
+import { buildGraphqlQueryFromFilterValues } from "@/registry/new-york/blocks/index-table/utils/build-graphql-query-from-filter-values";
+import { Input } from "@/registry/new-york/blocks/input/input";
 import {
   Table,
   type TableActionType,
   type TableColumnProps,
   type TableProps,
 } from "@/registry/new-york/blocks/table/table";
+import { Field } from "@/registry/new-york/types/field";
 import { View, ViewProps } from "@/registry/new-york/blocks/view/view";
 import { Button } from "@/registry/new-york/ui/button";
-import { Label } from "@/registry/new-york/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/registry/new-york/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/registry/new-york/ui/radio-group";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/registry/new-york/ui/tooltip";
-
-import {
-  EmptyState,
-  EmptyStateProps,
-} from "@/registry/new-york/blocks/empty-state/empty-state";
-import { Field } from "@/registry/new-york/types/field";
 import {
   Dialog,
   DialogContent,
@@ -88,11 +79,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/registry/new-york/ui/form";
-import { Input } from "@/registry/new-york/blocks/input/input";
-import { OrderDirectionList } from "@/registry/new-york/blocks/index-table/order-direction-list";
-
-import { OrderDirection } from "@/registry/new-york/blocks/index-table/order-direction-list";
-import { buildGraphqlQueryFromFilterValues } from "@/registry/new-york/blocks/index-table/utils/build-graphql-query-from-filter-values";
+import { Label } from "@/registry/new-york/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/registry/new-york/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/registry/new-york/ui/radio-group";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/registry/new-york/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export interface IndexTableOrder<OrderField> {
@@ -511,12 +509,8 @@ export function IndexTable<Node, OrderField extends string>({
   }, [query, pagination, pageSize, orderField, orderDirection, tableActionRef]);
 
   return (
-    <div className="rounded-md shadow last-of-type:rounded-lg">
-      <div
-        className={cn(
-          !!(filters.length || search) && "border-b border-gray-200"
-        )}
-      >
+    <div className="overflow-hidden rounded-md border last-of-type:rounded-lg">
+      <div className={cn(!!(filters.length || search) && "border-b")}>
         {typeof toolBarRender !== "undefined" && toolBarRender()}
 
         <div className="flex items-center p-2">
@@ -755,7 +749,7 @@ export function IndexTable<Node, OrderField extends string>({
         {/* 当获取新数据的时候，加载状态可以覆盖在老数据上面 */}
         {loading && (
           <>
-            <div className="bg-surface absolute top-0 left-0 z-[2] h-full w-full opacity-50" />
+            <div className="bg-background absolute top-0 left-0 z-[2] h-full w-full opacity-50" />
             <Loader2 className="absolute top-0 right-0 bottom-0 left-0 z-10 m-auto animate-spin" />
           </>
         )}
