@@ -503,7 +503,7 @@ export function IndexTable<Node, OrderField extends string>({
       <div className={cn(!!(filters.length || search) && "border-b")}>
         {typeof toolBarRender !== "undefined" && toolBarRender()}
 
-        <div className="items-center space-y-2 p-2">
+        <div className="space-y-2 p-2">
           {enabledView && (
             <div className="mr-2 overflow-x-auto">
               <View
