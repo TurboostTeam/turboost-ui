@@ -11,6 +11,7 @@ import {
 import { cloneDeep, groupBy, reduce, sum } from "lodash";
 import {
   type ReactElement,
+  ReactNode,
   type RefObject,
   useCallback,
   useImperativeHandle,
@@ -19,15 +20,18 @@ import {
   useState,
 } from "react";
 
-import {
-  EmptyState,
-  type EmptyStateProps,
-} from "@/registry/new-york/blocks/empty-state/empty-state";
 import { Button } from "@/registry/new-york/ui/button";
 import { Checkbox } from "@/registry/new-york/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/registry/new-york/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { Spinner } from "@/registry/new-york/ui/spinner";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/registry/new-york/ui/empty";
 
 const columnAlignClass = {
   left: "text-left",
@@ -52,9 +56,11 @@ export type TableColumnProps<T> = ColumnDef<T> & {
 
 export interface TableProps<T> {
   tableActionRef?: RefObject<TableActionType | null>;
-  emptyStateIcon?: EmptyStateProps["icon"];
-  emptyStateTitle?: EmptyStateProps["title"];
-  emptyStateDescription?: EmptyStateProps["description"];
+  emptyState?: {
+    icon?: ReactNode;
+    title?: string;
+    description?: string;
+  };
   columns: Array<TableColumnProps<T>>;
   rowSelection?: {
     single?: boolean;
@@ -78,9 +84,7 @@ export interface TableProps<T> {
 }
 
 export function Table<T>({
-  emptyStateIcon,
-  emptyStateTitle,
-  emptyStateDescription,
+  emptyState,
   tableActionRef,
   columns,
   data,
@@ -535,12 +539,19 @@ export function Table<T>({
         </table>
 
         {data.length === 0 && (
-          <EmptyState
-            className="py-10"
-            description={emptyStateDescription}
-            icon={emptyStateIcon}
-            title={emptyStateTitle}
-          />
+          <Empty className="from-muted/50 to-background h-full bg-gradient-to-b from-30%">
+            <EmptyHeader>
+              {emptyState?.icon && (
+                <EmptyMedia variant="icon">{emptyState.icon}</EmptyMedia>
+              )}
+
+              {emptyState?.title && <EmptyTitle>{emptyState.title}</EmptyTitle>}
+
+              {emptyState?.description && (
+                <EmptyDescription>{emptyState.description}</EmptyDescription>
+              )}
+            </EmptyHeader>
+          </Empty>
         )}
       </div>
 

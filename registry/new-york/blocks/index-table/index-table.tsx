@@ -35,10 +35,6 @@ import {
 import { useForm } from "react-hook-form";
 
 import {
-  EmptyState,
-  EmptyStateProps,
-} from "@/registry/new-york/blocks/empty-state/empty-state";
-import {
   Filter,
   type FilterItemProps,
   type FilterSearchConfig,
@@ -86,6 +82,13 @@ import {
 import { cn } from "@/lib/utils";
 import { Input } from "@/registry/new-york/ui/input";
 import { Spinner } from "@/registry/new-york/ui/spinner";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/registry/new-york/ui/empty";
 
 export interface IndexTableOrder<OrderField> {
   field: OrderField;
@@ -134,8 +137,11 @@ export interface ViewFormData {
 }
 
 export interface IndexTableProps<Node, OrderField> {
-  emptyStateIcon?: EmptyStateProps["icon"];
-  emptyStateTitle?: EmptyStateProps["title"];
+  emptyState?: {
+    icon?: ReactNode;
+    title?: string;
+    description?: string;
+  };
   rowSelection?: {
     single?: boolean;
     allowSelectAll?: boolean;
@@ -149,7 +155,6 @@ export interface IndexTableProps<Node, OrderField> {
     max?: number;
     min?: number;
   };
-  emptyStateDescription?: EmptyStateProps["description"];
   actionRef?: RefObject<ActionType | null>;
   edges?: Array<IndexTableEdge<Node>>;
   filters?: Array<FilterItemProps<Node>>;
@@ -201,10 +206,8 @@ const getFilterFiledTypeParse = (
 };
 
 export function IndexTable<Node, OrderField extends string>({
-  emptyStateIcon,
-  emptyStateTitle,
   actionRef,
-  emptyStateDescription,
+  emptyState,
   defaultFilterValue,
   footer,
   filters = [],
@@ -698,12 +701,19 @@ export function IndexTable<Node, OrderField extends string>({
             onRow={onRow}
           />
         ) : !loading ? (
-          <EmptyState
-            className="py-10"
-            description={emptyStateDescription}
-            icon={emptyStateIcon}
-            title={emptyStateTitle}
-          />
+          <Empty className="from-muted/50 to-background h-full bg-gradient-to-b from-30%">
+            <EmptyHeader>
+              {emptyState?.icon && (
+                <EmptyMedia variant="icon">{emptyState.icon}</EmptyMedia>
+              )}
+
+              {emptyState?.title && <EmptyTitle>{emptyState.title}</EmptyTitle>}
+
+              {emptyState?.description && (
+                <EmptyDescription>{emptyState.description}</EmptyDescription>
+              )}
+            </EmptyHeader>
+          </Empty>
         ) : undefined}
 
         {/* 当获取新数据的时候，加载状态可以覆盖在老数据上面 */}

@@ -60,20 +60,6 @@
       ]
     },
     {
-      "name": "empty-state",
-      "type": "registry:component",
-      "title": "Empty State",
-      "description": "A empty state component",
-      "dependencies": ["lucide-react"],
-      "files": [
-        {
-          "path": "registry/new-york/blocks/empty-state/empty-state.tsx",
-          "type": "registry:component",
-          "target": "components/turboost-ui/empty-state/empty-state.tsx"
-        }
-      ]
-    },
-    {
       "name": "filter",
       "type": "registry:block",
       "title": "Filter",
