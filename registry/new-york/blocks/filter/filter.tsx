@@ -19,12 +19,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/registry/new-york/ui/dropdown-menu";
-import { Input } from "@/registry/new-york/blocks/input/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/registry/new-york/ui/popover";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/registry/new-york/ui/input-group";
 
 const isEmpty = (value: unknown): boolean => {
   return (
@@ -227,28 +231,32 @@ export function Filter<T>({
               control={control}
               name="query"
               render={({ field }) => (
-                <Input
-                  disabled={field?.disabled ?? search?.disabled}
-                  placeholder={search?.queryPlaceholder}
-                  prefix={search?.queryPrefix ?? <Search className="size-4" />}
-                  suffix={
-                    loading ? (
+                <InputGroup>
+                  <InputGroupInput
+                    disabled={field?.disabled ?? search?.disabled}
+                    placeholder={search?.queryPlaceholder}
+                    value={field.value}
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && typeof search !== "undefined") {
+                        e.preventDefault();
+                        handleChange();
+                      }
+                    }}
+                  />
+                  <InputGroupAddon>
+                    {search?.queryPrefix ?? <Search />}
+                  </InputGroupAddon>
+                  <InputGroupAddon align="inline-end">
+                    {loading ? (
                       <Loader2 className="animate-spin" />
                     ) : (
                       search?.querySuffix
-                    )
-                  }
-                  value={field.value}
-                  onChange={(value) => {
-                    field.onChange(value);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && typeof search !== "undefined") {
-                      e.preventDefault();
-                      handleChange();
-                    }
-                  }}
-                />
+                    )}
+                  </InputGroupAddon>
+                </InputGroup>
               )}
             />
           )}

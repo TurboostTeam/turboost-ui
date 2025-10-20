@@ -47,7 +47,6 @@ import {
 import { OrderDirectionList } from "@/registry/new-york/blocks/index-table/order-direction-list";
 import { OrderDirection } from "@/registry/new-york/blocks/index-table/order-direction-list";
 import { buildGraphqlQueryFromFilterValues } from "@/registry/new-york/blocks/index-table/utils/build-graphql-query-from-filter-values";
-import { Input } from "@/registry/new-york/blocks/input/input";
 import {
   Table,
   type TableActionType,
@@ -85,6 +84,7 @@ import {
   TooltipTrigger,
 } from "@/registry/new-york/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { Input } from "@/registry/new-york/ui/input";
 
 export interface IndexTableOrder<OrderField> {
   field: OrderField;
