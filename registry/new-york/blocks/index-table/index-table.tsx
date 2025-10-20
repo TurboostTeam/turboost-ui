@@ -11,7 +11,7 @@ import {
   pick,
   zipObject,
 } from "lodash";
-import { ArrowDownUp, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowDownUp, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   parseAsArrayOf,
   parseAsBoolean,
@@ -85,6 +85,7 @@ import {
 } from "@/registry/new-york/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Input } from "@/registry/new-york/ui/input";
+import { Spinner } from "@/registry/new-york/ui/spinner";
 
 export interface IndexTableOrder<OrderField> {
   field: OrderField;
@@ -626,7 +627,7 @@ export function IndexTable<Node, OrderField extends string>({
                       onClick={handleViewSave}
                     >
                       {viewConfig?.loading ? (
-                        <Loader2 className="animate-spin" />
+                        <Spinner />
                       ) : (
                         translate("turboost_ui.index_table.view.save") ?? "Save"
                       )}
@@ -705,7 +706,7 @@ export function IndexTable<Node, OrderField extends string>({
         {loading && (
           <>
             <div className="bg-background absolute top-0 left-0 z-[2] h-full w-full opacity-50" />
-            <Loader2 className="absolute top-0 right-0 bottom-0 left-0 z-10 m-auto animate-spin" />
+            <Spinner className="absolute top-0 right-0 bottom-0 left-0 z-10 m-auto" />
           </>
         )}
       </div>
@@ -785,7 +786,7 @@ export function IndexTable<Node, OrderField extends string>({
               <DialogFooter>
                 <Button type="submit">
                   {viewConfig?.loading ? (
-                    <Loader2 className="animate-spin" />
+                    <Spinner />
                   ) : (
                     translate(
                       "turboost_ui.index_table.view.create_dialog.form.submit_btn.content"

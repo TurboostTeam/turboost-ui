@@ -9,7 +9,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { cloneDeep, groupBy, reduce, sum } from "lodash";
-import { Loader2 } from "lucide-react";
 import {
   type ReactElement,
   type RefObject,
@@ -28,6 +27,7 @@ import { Button } from "@/registry/new-york/ui/button";
 import { Checkbox } from "@/registry/new-york/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/registry/new-york/ui/radio-group";
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/registry/new-york/ui/spinner";
 
 const columnAlignClass = {
   left: "text-left",
@@ -615,8 +615,8 @@ export function Table<T>({
       )}
 
       {loading && (
-        <div className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
-          <Loader2 className="animate-spin" />
+        <div className="bg-background absolute top-0 left-0 w-full h-full z-10 opacity-50">
+          <Spinner className="absolute top-0 right-0 bottom-0 left-0 z-10 m-auto" />
         </div>
       )}
     </div>

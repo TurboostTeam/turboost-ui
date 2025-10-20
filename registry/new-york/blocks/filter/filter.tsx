@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { forEach, isPlainObject, omitBy, transform } from "lodash";
-import { ChevronDown, Loader2, Plus, Search, X } from "lucide-react";
+import { ChevronDown, Plus, Search, X } from "lucide-react";
 import {
   type ReactElement,
   type ReactNode,
@@ -29,6 +29,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/registry/new-york/ui/input-group";
+import { Spinner } from "@/registry/new-york/ui/spinner";
 
 const isEmpty = (value: unknown): boolean => {
   return (
@@ -250,11 +251,7 @@ export function Filter<T>({
                     {search?.queryPrefix ?? <Search />}
                   </InputGroupAddon>
                   <InputGroupAddon align="inline-end">
-                    {loading ? (
-                      <Loader2 className="animate-spin" />
-                    ) : (
-                      search?.querySuffix
-                    )}
+                    {loading ? <Spinner /> : search?.querySuffix}
                   </InputGroupAddon>
                 </InputGroup>
               )}
