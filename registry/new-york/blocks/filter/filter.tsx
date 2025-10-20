@@ -124,7 +124,6 @@ export interface FilterProps<T> {
   filters?: Array<FilterItemProps<T>>;
   extra?: ReactNode;
   search?: false | FilterSearchConfig;
-  showFilterItems?: boolean;
   values?: Record<Field<T>, any> & { query?: string };
   onChange?: (value: Record<Field<T>, any> & { query?: string }) => void;
   t?: Function;
@@ -136,7 +135,6 @@ export function Filter<T>({
   filters = [],
   extra,
   search,
-  showFilterItems = true,
   values,
   onChange,
   t,
@@ -145,7 +143,11 @@ export function Filter<T>({
     return typeof t === "function" ? t : () => undefined;
   }, [t]);
 
-  const { control, setValue, watch, reset } = useForm<any>();
+  const { control, setValue, watch, reset } = useForm<any>({
+    defaultValues: {
+      query: "",
+    },
+  });
 
   // 将筛选条件分组为固定和非固定两类
   const [{ fixedFilters, unfixedFilters }, setFilterGroups] = useState({
@@ -214,7 +216,7 @@ export function Filter<T>({
   }, [values, watch, reset]);
 
   return (
-    <div className={cn("space-y-3", showFilterItems && "flex-1", className)}>
+    <div className={cn("flex-1 space-y-3", className)}>
       {!(
         (typeof search === "undefined" || search === false) &&
         typeof extra === "undefined"
@@ -255,7 +257,7 @@ export function Filter<T>({
         </div>
       )}
 
-      {showFilterItems && filters.length > 0 && (
+      {filters.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {fixedFilters.map(({ field, label, render, renderValue }) => {
             const originalFilter = filters.find((item) => item.field === field);
