@@ -469,10 +469,14 @@ export function IndexTable<Node, OrderField extends string>({
 
   // 当前视图以 url 为准，如果没有以本地为准
   useEffect(() => {
-    if (urlQueryStates?.selectedView && currentSelectedViewKeyRef) {
+    if (
+      enabledView &&
+      urlQueryStates?.selectedView &&
+      currentSelectedViewKeyRef
+    ) {
       currentSelectedViewKeyRef.current = urlQueryStates?.selectedView;
     }
-  }, [urlQueryStates?.selectedView]);
+  }, [urlQueryStates?.selectedView, enabledView]);
 
   useEffect(() => {
     onChange?.({
