@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { forEach, isPlainObject, omitBy, transform } from "lodash";
-import { ChevronDown, Loader2, Plus, Search, X } from "lucide-react";
+import { ChevronDown, Plus, Search, X } from "lucide-react";
 import {
   type ReactElement,
   type ReactNode,
@@ -19,12 +19,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/registry/new-york/ui/dropdown-menu";
-import { Input } from "@/registry/new-york/blocks/input/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/registry/new-york/ui/popover";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/registry/new-york/ui/input-group";
+import { Spinner } from "@/registry/new-york/ui/spinner";
 
 const isEmpty = (value: unknown): boolean => {
   return (
@@ -124,7 +129,6 @@ export interface FilterProps<T> {
   filters?: Array<FilterItemProps<T>>;
   extra?: ReactNode;
   search?: false | FilterSearchConfig;
-  showFilterItems?: boolean;
   values?: Record<Field<T>, any> & { query?: string };
   onChange?: (value: Record<Field<T>, any> & { query?: string }) => void;
   t?: Function;
@@ -136,7 +140,6 @@ export function Filter<T>({
   filters = [],
   extra,
   search,
-  showFilterItems = true,
   values,
   onChange,
   t,
@@ -145,7 +148,11 @@ export function Filter<T>({
     return typeof t === "function" ? t : () => undefined;
   }, [t]);
 
-  const { control, setValue, watch, reset } = useForm<any>();
+  const { control, setValue, watch, reset } = useForm<any>({
+    defaultValues: {
+      query: "",
+    },
+  });
 
   // 将筛选条件分组为固定和非固定两类
   const [{ fixedFilters, unfixedFilters }, setFilterGroups] = useState({
@@ -214,7 +221,7 @@ export function Filter<T>({
   }, [values, watch, reset]);
 
   return (
-    <div className={cn("space-y-3", showFilterItems && "flex-1", className)}>
+    <div className={cn("space-y-3", className)}>
       {!(
         (typeof search === "undefined" || search === false) &&
         typeof extra === "undefined"
@@ -225,28 +232,28 @@ export function Filter<T>({
               control={control}
               name="query"
               render={({ field }) => (
-                <Input
-                  disabled={field?.disabled ?? search?.disabled}
-                  placeholder={search?.queryPlaceholder}
-                  prefix={search?.queryPrefix ?? <Search className="size-4" />}
-                  suffix={
-                    loading ? (
-                      <Loader2 className="animate-spin" />
-                    ) : (
-                      search?.querySuffix
-                    )
-                  }
-                  value={field.value}
-                  onChange={(value) => {
-                    field.onChange(value);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && typeof search !== "undefined") {
-                      e.preventDefault();
-                      handleChange();
-                    }
-                  }}
-                />
+                <InputGroup>
+                  <InputGroupInput
+                    disabled={field?.disabled ?? search?.disabled}
+                    placeholder={search?.queryPlaceholder}
+                    value={field.value}
+                    onChange={(value) => {
+                      field.onChange(value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && typeof search !== "undefined") {
+                        e.preventDefault();
+                        handleChange();
+                      }
+                    }}
+                  />
+                  <InputGroupAddon>
+                    {search?.queryPrefix ?? <Search />}
+                  </InputGroupAddon>
+                  <InputGroupAddon align="inline-end">
+                    {loading ? <Spinner /> : search?.querySuffix}
+                  </InputGroupAddon>
+                </InputGroup>
               )}
             />
           )}
@@ -255,7 +262,7 @@ export function Filter<T>({
         </div>
       )}
 
-      {showFilterItems && filters.length > 0 && (
+      {filters.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {fixedFilters.map(({ field, label, render, renderValue }) => {
             const originalFilter = filters.find((item) => item.field === field);

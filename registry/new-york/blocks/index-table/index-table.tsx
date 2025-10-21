@@ -11,14 +11,7 @@ import {
   pick,
   zipObject,
 } from "lodash";
-import {
-  ArrowDownUp,
-  ChevronLeft,
-  ChevronRight,
-  ListFilter,
-  Loader2,
-  Search,
-} from "lucide-react";
+import { ArrowDownUp, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   parseAsArrayOf,
   parseAsBoolean,
@@ -42,10 +35,6 @@ import {
 import { useForm } from "react-hook-form";
 
 import {
-  EmptyState,
-  EmptyStateProps,
-} from "@/registry/new-york/blocks/empty-state/empty-state";
-import {
   Filter,
   type FilterItemProps,
   type FilterSearchConfig,
@@ -54,7 +43,6 @@ import {
 import { OrderDirectionList } from "@/registry/new-york/blocks/index-table/order-direction-list";
 import { OrderDirection } from "@/registry/new-york/blocks/index-table/order-direction-list";
 import { buildGraphqlQueryFromFilterValues } from "@/registry/new-york/blocks/index-table/utils/build-graphql-query-from-filter-values";
-import { Input } from "@/registry/new-york/blocks/input/input";
 import {
   Table,
   type TableActionType,
@@ -92,6 +80,15 @@ import {
   TooltipTrigger,
 } from "@/registry/new-york/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { Input } from "@/registry/new-york/ui/input";
+import { Spinner } from "@/registry/new-york/ui/spinner";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/registry/new-york/ui/empty";
 
 export interface IndexTableOrder<OrderField> {
   field: OrderField;
@@ -140,8 +137,11 @@ export interface ViewFormData {
 }
 
 export interface IndexTableProps<Node, OrderField> {
-  emptyStateIcon?: EmptyStateProps["icon"];
-  emptyStateTitle?: EmptyStateProps["title"];
+  emptyState?: {
+    icon?: ReactNode;
+    title?: string;
+    description?: string;
+  };
   rowSelection?: {
     single?: boolean;
     allowSelectAll?: boolean;
@@ -155,7 +155,6 @@ export interface IndexTableProps<Node, OrderField> {
     max?: number;
     min?: number;
   };
-  emptyStateDescription?: EmptyStateProps["description"];
   actionRef?: RefObject<ActionType | null>;
   edges?: Array<IndexTableEdge<Node>>;
   filters?: Array<FilterItemProps<Node>>;
@@ -207,10 +206,8 @@ const getFilterFiledTypeParse = (
 };
 
 export function IndexTable<Node, OrderField extends string>({
-  emptyStateIcon,
-  emptyStateTitle,
   actionRef,
-  emptyStateDescription,
+  emptyState,
   defaultFilterValue,
   footer,
   filters = [],
@@ -242,9 +239,6 @@ export function IndexTable<Node, OrderField extends string>({
       name: "",
     },
   });
-
-  // 在视图模式下，是否显示过滤组件
-  const [showFilterComponent, setShowFilterComponent] = useState(false);
 
   // 当前进行过滤操作时选中的视图 key
   const currentSelectedViewKeyRef = useRef<string | undefined>(undefined);
@@ -373,7 +367,6 @@ export function IndexTable<Node, OrderField extends string>({
 
       createViewForm.reset();
 
-      setShowFilterComponent(false);
       setShowCreateViewDialog(false);
       currentSelectedViewKeyRef.current = undefined;
     },
@@ -422,19 +415,16 @@ export function IndexTable<Node, OrderField extends string>({
     }
   }, [filterValues, transformedParams]);
 
-  // 如果 url 不存在 selectedView 参数，则根据过滤项和查询条件来决定是否显示过滤组件
+  // 如果 url 不存在 selectedView 参数，则根据过滤项和查询条件来决定视图行为
   useEffect(() => {
     if (enabledView && typeof usefulQueryStates?.selectedView === "undefined") {
       if (
-        filters.some(
-          (item) => typeof usefulQueryStates?.[item.field] !== "undefined"
-        ) ||
-        typeof usefulQueryStates?.query !== "undefined"
+        !(
+          filters.some(
+            (item) => typeof usefulQueryStates?.[item.field] !== "undefined"
+          ) || typeof usefulQueryStates?.query !== "undefined"
+        )
       ) {
-        if (!showFilterComponent) {
-          setShowFilterComponent(true);
-        }
-      } else {
         // 没有符合的过滤项，则将视图参数设置为第一个视图
         const params = new URLSearchParams(window.location.search);
 
@@ -451,13 +441,7 @@ export function IndexTable<Node, OrderField extends string>({
         window.history.pushState(null, "", url.toString());
       }
     }
-  }, [
-    enabledView,
-    filters,
-    showFilterComponent,
-    usefulQueryStates,
-    viewConfig,
-  ]);
+  }, [enabledView, filters, usefulQueryStates, viewConfig]);
 
   // 当视图参数存在，但是视图参数不包含在配置项里面时，则将视图参数设置为第一个视图
   useEffect(() => {
@@ -482,11 +466,20 @@ export function IndexTable<Node, OrderField extends string>({
         url.searchParams.set("selectedView", viewConfig!.items[0].key);
 
         window.history.pushState(null, "", url.toString());
-      } else if (typeof currentSelectedViewKeyRef.current === "undefined") {
-        setShowFilterComponent(false);
       }
     }
   }, [enabledView, viewConfig, usefulQueryStates]);
+
+  // 当前视图以 url 为准，如果没有以本地为准
+  useEffect(() => {
+    if (
+      enabledView &&
+      urlQueryStates?.selectedView &&
+      currentSelectedViewKeyRef
+    ) {
+      currentSelectedViewKeyRef.current = urlQueryStates?.selectedView;
+    }
+  }, [urlQueryStates?.selectedView, enabledView]);
 
   useEffect(() => {
     onChange?.({
@@ -513,10 +506,14 @@ export function IndexTable<Node, OrderField extends string>({
       <div className={cn(!!(filters.length || search) && "border-b")}>
         {typeof toolBarRender !== "undefined" && toolBarRender()}
 
-        <div className="flex items-center p-2">
-          {enabledView && !showFilterComponent && (
-            <div className="mr-2 flex-1 overflow-x-auto">
-              <View {...viewConfig!} t={t} />
+        <div className="space-y-2 p-2">
+          {enabledView && (
+            <div className="mr-2 overflow-x-auto">
+              <View
+                {...viewConfig!}
+                t={t}
+                activeKey={currentSelectedViewKeyRef.current}
+              />
             </div>
           )}
 
@@ -524,102 +521,6 @@ export function IndexTable<Node, OrderField extends string>({
             t={t}
             extra={
               <>
-                {enabledView ? (
-                  showFilterComponent ? (
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          if (
-                            (typeof currentSelectedViewKeyRef.current ===
-                              "undefined" &&
-                              typeof usefulQueryStates?.selectedView ===
-                                "undefined") ||
-                            currentSelectedViewKeyRef.current !==
-                              usefulQueryStates?.selectedView
-                          ) {
-                            // 没有符合的过滤项，则将视图参数设置为第一个视图
-                            const params = new URLSearchParams(
-                              window.location.search
-                            );
-
-                            const needClearFields = Array.from(params.keys());
-
-                            const url = new URL(window.location.href);
-
-                            needClearFields.forEach((key) => {
-                              url.searchParams.delete(key);
-                            });
-
-                            url.searchParams.set(
-                              "selectedView",
-                              typeof currentSelectedViewKeyRef.current !==
-                                "undefined"
-                                ? currentSelectedViewKeyRef.current
-                                : viewConfig!.items[0].key
-                            );
-
-                            window.history.pushState(null, "", url.toString());
-
-                            setShowFilterComponent(false);
-                            currentSelectedViewKeyRef.current = undefined;
-                          } else {
-                            setFilterValues(
-                              typeof filterValues === "undefined"
-                                ? undefined
-                                : { ...filterValues }
-                            );
-                            setShowFilterComponent(false);
-                            currentSelectedViewKeyRef.current = undefined;
-                          }
-                        }}
-                      >
-                        {translate("turboost_ui.index_table.view.cancel") ??
-                          "Cancel"}
-                      </Button>
-                      <Button
-                        disabled={
-                          typeof usefulQueryStates?.selectedView !== "undefined"
-                        }
-                        size="sm"
-                        variant="ghost"
-                        onClick={handleViewSave}
-                      >
-                        {viewConfig?.loading ? (
-                          <Loader2 className="animate-spin" />
-                        ) : (
-                          translate("turboost_ui.index_table.view.save") ??
-                          "Save"
-                        )}
-                      </Button>
-                    </div>
-                  ) : (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setShowFilterComponent(true);
-                            currentSelectedViewKeyRef.current =
-                              urlQueryStates?.selectedView ?? undefined;
-                          }}
-                        >
-                          <Search />
-                          <ListFilter />
-                        </Button>
-                      </TooltipTrigger>
-
-                      <TooltipContent>
-                        {translate(
-                          "turboost_ui.index_table.view.search_and_filter"
-                        ) ?? "Search and Filter"}
-                      </TooltipContent>
-                    </Tooltip>
-                  )
-                ) : undefined}
-
                 {typeof orderOptions !== "undefined" &&
                 orderOptions.length > 0 ? (
                   <Popover>
@@ -671,18 +572,80 @@ export function IndexTable<Node, OrderField extends string>({
                     </PopoverContent>
                   </Popover>
                 ) : undefined}
+
+                {enabledView ? (
+                  <div className="flex items-center">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={!!urlQueryStates?.selectedView}
+                      onClick={() => {
+                        if (
+                          (typeof currentSelectedViewKeyRef.current ===
+                            "undefined" &&
+                            typeof usefulQueryStates?.selectedView ===
+                              "undefined") ||
+                          currentSelectedViewKeyRef.current !==
+                            usefulQueryStates?.selectedView
+                        ) {
+                          // 没有符合的过滤项，则将视图参数设置为第一个视图
+                          const params = new URLSearchParams(
+                            window.location.search
+                          );
+
+                          const needClearFields = Array.from(params.keys());
+
+                          const url = new URL(window.location.href);
+
+                          needClearFields.forEach((key) => {
+                            url.searchParams.delete(key);
+                          });
+
+                          url.searchParams.set(
+                            "selectedView",
+                            typeof currentSelectedViewKeyRef.current !==
+                              "undefined"
+                              ? currentSelectedViewKeyRef.current
+                              : viewConfig!.items[0].key
+                          );
+
+                          window.history.pushState(null, "", url.toString());
+
+                          currentSelectedViewKeyRef.current = undefined;
+                        } else {
+                          setFilterValues(
+                            typeof filterValues === "undefined"
+                              ? undefined
+                              : { ...filterValues }
+                          );
+                          currentSelectedViewKeyRef.current = undefined;
+                        }
+                      }}
+                    >
+                      {translate("turboost_ui.index_table.view.cancel") ??
+                        "Cancel"}
+                    </Button>
+                    <Button
+                      disabled={
+                        typeof usefulQueryStates?.selectedView !== "undefined"
+                      }
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleViewSave}
+                    >
+                      {viewConfig?.loading ? (
+                        <Spinner />
+                      ) : (
+                        translate("turboost_ui.index_table.view.save") ?? "Save"
+                      )}
+                    </Button>
+                  </div>
+                ) : undefined}
               </>
             }
             filters={filters}
             loading={loading}
-            search={
-              !enabledView || (enabledView && showFilterComponent)
-                ? search
-                : false
-            }
-            showFilterItems={
-              !enabledView || (enabledView && showFilterComponent)
-            }
+            search={search}
             values={filterValues}
             onChange={(result) => {
               // 根据是否开启视图来决定如何更新过滤项
@@ -738,19 +701,26 @@ export function IndexTable<Node, OrderField extends string>({
             onRow={onRow}
           />
         ) : !loading ? (
-          <EmptyState
-            className="py-10"
-            description={emptyStateDescription}
-            icon={emptyStateIcon}
-            title={emptyStateTitle}
-          />
+          <Empty className="from-muted/50 to-background h-full bg-gradient-to-b from-30%">
+            <EmptyHeader>
+              {emptyState?.icon && (
+                <EmptyMedia variant="icon">{emptyState.icon}</EmptyMedia>
+              )}
+
+              {emptyState?.title && <EmptyTitle>{emptyState.title}</EmptyTitle>}
+
+              {emptyState?.description && (
+                <EmptyDescription>{emptyState.description}</EmptyDescription>
+              )}
+            </EmptyHeader>
+          </Empty>
         ) : undefined}
 
         {/* 当获取新数据的时候，加载状态可以覆盖在老数据上面 */}
         {loading && (
           <>
             <div className="bg-background absolute top-0 left-0 z-[2] h-full w-full opacity-50" />
-            <Loader2 className="absolute top-0 right-0 bottom-0 left-0 z-10 m-auto animate-spin" />
+            <Spinner className="absolute top-0 right-0 bottom-0 left-0 z-10 m-auto" />
           </>
         )}
       </div>
@@ -830,7 +800,7 @@ export function IndexTable<Node, OrderField extends string>({
               <DialogFooter>
                 <Button type="submit">
                   {viewConfig?.loading ? (
-                    <Loader2 className="animate-spin" />
+                    <Spinner />
                   ) : (
                     translate(
                       "turboost_ui.index_table.view.create_dialog.form.submit_btn.content"
