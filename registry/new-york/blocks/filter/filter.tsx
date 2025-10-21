@@ -221,7 +221,7 @@ export function Filter<T>({
   }, [values, watch, reset]);
 
   return (
-    <div className={cn("flex-1 space-y-3", className)}>
+    <div className={cn("space-y-3", className)}>
       {!(
         (typeof search === "undefined" || search === false) &&
         typeof extra === "undefined"
