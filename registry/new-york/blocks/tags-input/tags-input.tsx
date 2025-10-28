@@ -3,8 +3,8 @@
 import { XIcon } from "lucide-react";
 import * as React from "react";
 
-import { Badge } from "@/registry/new-york/ui/badge";
-import { Button } from "@/registry/new-york/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type TagsInputProps = Omit<

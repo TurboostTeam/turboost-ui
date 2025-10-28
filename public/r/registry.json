@@ -72,8 +72,12 @@
         "dropdown-menu",
         "popover",
         "input-group",
+<<<<<<< HEAD
         "spinner",
         "select"
+=======
+        "spinner"
+>>>>>>> main
       ],
       "files": [
         {

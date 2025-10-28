@@ -2,7 +2,7 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import { type FC, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 
-import { Button } from "@/registry/new-york/ui/button";
+import { Button } from "@/components/ui/button";
 
 export enum OrderDirection {
   ASC = "ASC",
