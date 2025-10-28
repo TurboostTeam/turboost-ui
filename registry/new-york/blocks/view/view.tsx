@@ -4,8 +4,8 @@ import { ChevronDownIcon, PlusIcon } from "lucide-react";
 import { type ReactElement, useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { Button } from "@/registry/new-york/ui/button";
-import { Input } from "@/registry/new-york/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 import {
   Dialog,
@@ -15,13 +15,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/registry/new-york/ui/dialog";
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/registry/new-york/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import {
   Form,
   FormControl,
@@ -29,8 +29,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/registry/new-york/ui/form";
-import { Spinner } from "@/registry/new-york/ui/spinner";
+} from "@/components/ui/form";
+import { Spinner } from "@/components/ui/spinner";
 
 interface ViewFormData {
   name: string;

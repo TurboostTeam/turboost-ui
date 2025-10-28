@@ -1,5 +1,5 @@
 import { Filter } from "@/registry/new-york/blocks/filter/filter";
-import { Input } from "@/registry/new-york/ui/input";
+import { Input } from "@/components/ui/input";
 import { Info, Search } from "lucide-react";
 
 export function FilterPreview() {
