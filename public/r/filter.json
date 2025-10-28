@@ -15,7 +15,8 @@
     "dropdown-menu",
     "popover",
     "input-group",
-    "spinner"
+    "spinner",
+    "select"
   ],
   "files": [
     {
