@@ -20,18 +20,18 @@ import {
   useState,
 } from "react";
 
-import { Button } from "@/registry/new-york/ui/button";
-import { Checkbox } from "@/registry/new-york/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/registry/new-york/ui/radio-group";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
-import { Spinner } from "@/registry/new-york/ui/spinner";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Empty,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/registry/new-york/ui/empty";
+} from "@/components/ui/empty";
 
 const columnAlignClass = {
   left: "text-left",

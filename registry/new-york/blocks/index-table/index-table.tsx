@@ -51,14 +51,14 @@ import {
 } from "@/registry/new-york/blocks/table/table";
 import { Field } from "@/registry/new-york/types/field";
 import { View, ViewProps } from "@/registry/new-york/blocks/view/view";
-import { Button } from "@/registry/new-york/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/registry/new-york/ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -66,29 +66,29 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/registry/new-york/ui/form";
-import { Label } from "@/registry/new-york/ui/label";
+} from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/registry/new-york/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/registry/new-york/ui/radio-group";
+} from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/registry/new-york/ui/tooltip";
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Input } from "@/registry/new-york/ui/input";
-import { Spinner } from "@/registry/new-york/ui/spinner";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Empty,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/registry/new-york/ui/empty";
+} from "@/components/ui/empty";
 
 export interface IndexTableOrder<OrderField> {
   field: OrderField;

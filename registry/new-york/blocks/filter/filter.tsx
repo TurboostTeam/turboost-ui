@@ -12,24 +12,24 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { type Field } from "@/registry/new-york/types/field";
-import { Badge } from "@/registry/new-york/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/registry/new-york/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/registry/new-york/ui/popover";
+} from "@/components/ui/popover";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "@/registry/new-york/ui/input-group";
-import { Spinner } from "@/registry/new-york/ui/spinner";
+} from "@/components/ui/input-group";
+import { Spinner } from "@/components/ui/spinner";
 
 const isEmpty = (value: unknown): boolean => {
   return (
