@@ -290,66 +290,68 @@ export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
 
   return (
     <div className="flex gap-2">
-      <div className="bg-background rounded-lg border p-4">
-        <div className="flex gap-2">
-          {/* 左侧大括号连接线 + 逻辑运算符按钮 */}
-          {items.length > 1 && (
-            <div className="flex flex-col w-10 pl-4 py-4">
-              {/* 上半部分 - 顶部圆角 + 垂直线 */}
-              <div className="border-l-2 border-t-2 border-border rounded-tl-md w-full flex-1" />
+      <div className="flex-1 bg-background rounded-lg border p-4">
+        {items.length > 0 && (
+          <div className="flex gap-2 mb-4">
+            {/* 左侧大括号连接线 + 逻辑运算符按钮 */}
+            {items.length > 1 && (
+              <div className="flex flex-col w-10 pl-4 py-4">
+                {/* 上半部分 - 顶部圆角 + 垂直线 */}
+                <div className="border-l-2 border-t-2 border-border rounded-tl-md w-full flex-1" />
 
-              {/* 逻辑运算符按钮 - 居中放置 */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs -translate-x-1/2"
-                onClick={() => {
-                  const newLogical =
-                    logical === ComplexFilterLogical.AND
-                      ? ComplexFilterLogical.OR
-                      : ComplexFilterLogical.AND;
-                  handleLogicalChange(newLogical);
-                }}
-              >
-                {i18n.logicals[logical]}
-              </Button>
+                {/* 逻辑运算符按钮 - 居中放置 */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs -translate-x-1/2"
+                  onClick={() => {
+                    const newLogical =
+                      logical === ComplexFilterLogical.AND
+                        ? ComplexFilterLogical.OR
+                        : ComplexFilterLogical.AND;
+                    handleLogicalChange(newLogical);
+                  }}
+                >
+                  {i18n.logicals[logical]}
+                </Button>
 
-              {/* 下半部分 - 垂直线 + 底部圆角 */}
-              <div
-                className="border-l-2 border-b-2 border-border rounded-bl-md w-full flex-1"
-                style={{ height: "calc(50% - 18px)" }}
-              />
-            </div>
-          )}
-
-          {/* 右侧条件列表 */}
-          <div className="flex-1 space-y-3">
-            {items.map((item, index) => (
-              <div key={index}>
-                {isFilterGroup(item) ? (
-                  <ComplexFilterGroup
-                    i18n={i18n}
-                    filters={filters}
-                    value={item}
-                    onChange={(newValue) => handleItemChange(index, newValue)}
-                    onRemove={() => handleItemRemove(index)}
-                    depth={depth + 1}
-                  />
-                ) : (
-                  <ComplexFilterConditionRow
-                    i18n={i18n}
-                    filters={filters}
-                    value={item}
-                    onChange={(newValue) => handleItemChange(index, newValue)}
-                    onRemove={() => handleItemRemove(index)}
-                  />
-                )}
+                {/* 下半部分 - 垂直线 + 底部圆角 */}
+                <div
+                  className="border-l-2 border-b-2 border-border rounded-bl-md w-full flex-1"
+                  style={{ height: "calc(50% - 18px)" }}
+                />
               </div>
-            ))}
-          </div>
-        </div>
+            )}
 
-        <div className={cn("flex gap-2 mt-4", items.length > 0 && "ml-12")}>
+            {/* 右侧条件列表 */}
+            <div className="flex-1 space-y-3">
+              {items.map((item, index) => (
+                <div key={index}>
+                  {isFilterGroup(item) ? (
+                    <ComplexFilterGroup
+                      i18n={i18n}
+                      filters={filters}
+                      value={item}
+                      onChange={(newValue) => handleItemChange(index, newValue)}
+                      onRemove={() => handleItemRemove(index)}
+                      depth={depth + 1}
+                    />
+                  ) : (
+                    <ComplexFilterConditionRow
+                      i18n={i18n}
+                      filters={filters}
+                      value={item}
+                      onChange={(newValue) => handleItemChange(index, newValue)}
+                      onRemove={() => handleItemRemove(index)}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className={cn("flex gap-2", items.length > 1 && "ml-12")}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="h-8">
