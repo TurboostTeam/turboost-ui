@@ -1,6 +1,7 @@
-import { Filter } from "@/registry/components/filter/filter";
-import { Input } from "@/components/ui/input";
 import { Info, Search } from "lucide-react";
+
+import { Input } from "@/components/ui/input";
+import { Filter } from "@/registry/components/filter/filter";
 
 export function FilterPreview() {
   return (

@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { components } from "./preview";
 import { groupBy } from "lodash";
+import { useMemo } from "react";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { components } from "./preview";
 
 export default function Home() {
   const resources = useMemo(() => {

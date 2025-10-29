@@ -1,10 +1,11 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import { useState } from "react";
+
 import {
   ComplexFilter,
   ComplexFilterType,
   ComplexFilterValue,
 } from "./complex-filter";
-import { useState } from "react";
 
 const meta = {
   title: "Blocks/ComplexFilter",
