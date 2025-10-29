@@ -284,7 +284,7 @@ export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
 
   const handleAddGroup = () => {
     onChange({
-      [logical]: [...items, { [ComplexFilterLogical.AND]: [] }],
+      [logical]: [...items, { [ComplexFilterLogical.AND]: [{}] }],
     });
   };
 
