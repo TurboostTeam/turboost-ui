@@ -10,8 +10,7 @@ import {
   useState,
 } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { cn } from "@/lib/utils";
-import { type Field } from "@/registry/types/field";
+
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -20,16 +19,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
+import { type Field } from "@/registry/types/field";
 
 const isEmpty = (value: unknown): boolean => {
   return (

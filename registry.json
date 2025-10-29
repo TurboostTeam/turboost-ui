@@ -164,13 +164,29 @@
         "button",
         "input",
         "select",
-        "dropdown-menu"
+        "dropdown-menu",
+        "number-input"
       ],
       "files": [
         {
           "path": "registry/components/complex-filter/complex-filter.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/complex-filter/complex-filter.tsx"
+        }
+      ]
+    },
+    {
+      "name": "number-input",
+      "type": "registry:component",
+      "title": "Number Input",
+      "description": "A number input component with formatting support",
+      "dependencies": ["react-number-format"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/number-input/number-input.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/number-input/number-input.tsx"
         }
       ]
     }

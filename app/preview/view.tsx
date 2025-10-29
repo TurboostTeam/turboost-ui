@@ -1,11 +1,12 @@
 "use client";
 
+import { useCallback, useState } from "react";
+
 import {
   View,
   ViewItem,
   ViewItemEditType,
 } from "@/registry/components/view/view";
-import { useCallback, useState } from "react";
 
 export const ViewPreview = () => {
   const [views, setViews] = useState<ViewItem[]>([

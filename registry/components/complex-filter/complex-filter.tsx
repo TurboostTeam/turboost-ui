@@ -1,4 +1,16 @@
-import { FC, useMemo, useState, useRef, useEffect } from "react";
+"use client";
+
+import { ChevronDown, Plus,X } from "lucide-react";
+import { FC, useEffect,useMemo, useRef, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -6,16 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { X, ChevronDown, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NumberInput } from "@/registry/components/number-input/number-input";
 
 export enum ComplexFilterType {
   STRING = "string",
@@ -122,15 +126,16 @@ function cleanFilterValue(
   value: ComplexFilterValue
 ): ComplexFilterValue | undefined {
   if (isFilterGroup(value)) {
-    const logical = ComplexFilterLogical.AND in value
-      ? ComplexFilterLogical.AND
-      : ComplexFilterLogical.OR;
+    const logical =
+      ComplexFilterLogical.AND in value
+        ? ComplexFilterLogical.AND
+        : ComplexFilterLogical.OR;
     const items = value[logical];
 
     if (!items) return undefined;
 
     const cleanedItems = items
-      .map(item => cleanFilterValue(item))
+      .map((item) => cleanFilterValue(item))
       .filter((item): item is ComplexFilterValue => item !== undefined);
 
     if (cleanedItems.length === 0) return undefined;
@@ -143,6 +148,17 @@ function cleanFilterValue(
 
     const [, operatorValuePair] = entries[0];
     if (!operatorValuePair || Object.keys(operatorValuePair).length === 0) {
+      return undefined;
+    }
+
+    // 检查运算符是否有对应的值
+    const operatorEntries = Object.entries(operatorValuePair);
+    const hasValidValue = operatorEntries.some(([, val]) => {
+      // 值不能是 undefined 或 null（对于数字，0 和空字符串是有效的）
+      return val !== undefined && val !== null && val !== "";
+    });
+
+    if (!hasValidValue) {
       return undefined;
     }
 
@@ -242,16 +258,23 @@ export const ComplexFilterConditionRow: FC<ComplexFilterConditionRowProps> = ({
         </SelectContent>
       </Select>
 
-      <Input
-        className="min-w-[200px]"
-        placeholder={i18n.selectValue}
-        value={targetValue ?? ""}
-        onChange={(e) => handleValueChange(e.target.value)}
-        disabled={!operator}
-        type={
-          selectedFilter?.type === ComplexFilterType.NUMBER ? "number" : "text"
-        }
-      />
+      {selectedFilter?.type === ComplexFilterType.NUMBER ? (
+        <NumberInput
+          className="min-w-[200px]"
+          placeholder={i18n.selectValue}
+          value={targetValue ?? ""}
+          onValueChange={(values) => handleValueChange(values.floatValue)}
+          disabled={!operator}
+        />
+      ) : (
+        <Input
+          className="min-w-[200px]"
+          placeholder={i18n.selectValue}
+          value={targetValue ?? ""}
+          onChange={(e) => handleValueChange(e.target.value)}
+          disabled={!operator}
+        />
+      )}
 
       <Button variant="ghost" size="icon" onClick={onRemove}>
         <X className="h-4 w-4" />
@@ -424,9 +447,10 @@ export const ComplexFilter: FC<ComplexFilterProps> = ({
   onChange,
 }) => {
   // 内部维护完整的 value（包括空条件），用于 UI 显示和编辑
-  const [internalDisplayValue, setInternalDisplayValue] = useState<ComplexFilterValue>({
-    [ComplexFilterLogical.AND]: [],
-  });
+  const [internalDisplayValue, setInternalDisplayValue] =
+    useState<ComplexFilterValue>({
+      [ComplexFilterLogical.AND]: [],
+    });
 
   // 使用 ref 跟踪上一次清理后的 value 的字符串表示，用于去重
   const lastCleanedValueStrRef = useRef<string>("");
