@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { fn } from "storybook/test";
 
-import { ComplexFilter } from "../registry/new-york/blocks/complex-filter/complex-filter";
+import { ComplexFilter, ComplexFilterType } from "./complex-filter";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -28,27 +28,17 @@ type Story = StoryObj<typeof meta>;
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Primary: Story = {
   args: {
-    primary: true,
-    label: "Button",
-  },
-};
-
-export const Secondary: Story = {
-  args: {
-    label: "Button",
-  },
-};
-
-export const Large: Story = {
-  args: {
-    size: "large",
-    label: "Button",
-  },
-};
-
-export const Small: Story = {
-  args: {
-    size: "small",
-    label: "Button",
+    filters: [
+      {
+        field: "name",
+        label: "Name",
+        type: ComplexFilterType.STRING,
+      },
+      {
+        field: "age",
+        label: "Age",
+        type: ComplexFilterType.NUMBER,
+      },
+    ],
   },
 };
