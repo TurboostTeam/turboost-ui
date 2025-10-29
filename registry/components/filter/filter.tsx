@@ -11,7 +11,7 @@ import {
 } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import { type Field } from "@/registry/new-york/types/field";
+import { type Field } from "@/registry/types/field";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,

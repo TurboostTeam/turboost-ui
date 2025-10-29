@@ -4,7 +4,7 @@ import {
   View,
   ViewItem,
   ViewItemEditType,
-} from "@/registry/new-york/blocks/view/view";
+} from "@/registry/components/view/view";
 import { useCallback, useState } from "react";
 
 export const ViewPreview = () => {

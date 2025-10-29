@@ -1,6 +1,6 @@
 "use client";
 
-import { TagsInput } from "@/registry/new-york/blocks/tags-input/tags-input";
+import { TagsInput } from "@/registry/components/tags-input/tags-input";
 import { useState } from "react";
 
 export function TagsInputPreview() {

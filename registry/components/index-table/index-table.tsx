@@ -39,18 +39,18 @@ import {
   type FilterItemProps,
   type FilterSearchConfig,
   FilterTypeValue,
-} from "@/registry/new-york/blocks/filter/filter";
-import { OrderDirectionList } from "@/registry/new-york/blocks/index-table/order-direction-list";
-import { OrderDirection } from "@/registry/new-york/blocks/index-table/order-direction-list";
-import { buildGraphqlQueryFromFilterValues } from "@/registry/new-york/blocks/index-table/utils/build-graphql-query-from-filter-values";
+} from "@/registry/components/filter/filter";
+import { OrderDirectionList } from "@/registry/components/index-table/order-direction-list";
+import { OrderDirection } from "@/registry/components/index-table/order-direction-list";
+import { buildGraphqlQueryFromFilterValues } from "@/registry/components/index-table/utils/build-graphql-query-from-filter-values";
 import {
   Table,
   type TableActionType,
   type TableColumnProps,
   type TableProps,
-} from "@/registry/new-york/blocks/table/table";
-import { Field } from "@/registry/new-york/types/field";
-import { View, ViewProps } from "@/registry/new-york/blocks/view/view";
+} from "@/registry/components/table/table";
+import { Field } from "@/registry/types/field";
+import { View, ViewProps } from "@/registry/components/view/view";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

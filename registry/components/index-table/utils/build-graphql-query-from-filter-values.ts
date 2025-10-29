@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 import { compact, get, trim } from "lodash";
 
-import { FilterItemProps } from "@/registry/new-york/blocks/filter/filter";
-import { Field } from "@/registry/new-york/types/field";
+import { FilterItemProps } from "@/registry/components/filter/filter";
+import { Field } from "@/registry/types/field";
 
 export function buildGraphqlQueryFromFilterValues<Node>(
   filters: FilterItemProps<Node>[],

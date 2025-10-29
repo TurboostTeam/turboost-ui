@@ -12,7 +12,7 @@
       "registryDependencies": ["button", "badge"],
       "files": [
         {
-          "path": "registry/new-york/blocks/tags-input/tags-input.tsx",
+          "path": "registry/components/tags-input/tags-input.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/tags-input/tags-input.tsx"
         }
@@ -34,7 +34,7 @@
       ],
       "files": [
         {
-          "path": "registry/new-york/blocks/view/view.tsx",
+          "path": "registry/components/view/view.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/view/view.tsx"
         }
@@ -55,7 +55,7 @@
       ],
       "files": [
         {
-          "path": "registry/new-york/blocks/table/table.tsx",
+          "path": "registry/components/table/table.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/table/table.tsx"
         }
@@ -77,17 +77,17 @@
       ],
       "files": [
         {
-          "path": "registry/new-york/types/field.ts",
+          "path": "registry/types/field.ts",
           "type": "registry:file",
           "target": "components/turboost-ui/types/field.ts"
         },
         {
-          "path": "registry/new-york/blocks/filter/utils/transform-object-by-fields.ts",
+          "path": "registry/components/filter/utils/transform-object-by-fields.ts",
           "type": "registry:file",
           "target": "components/turboost-ui/filter/utils/transform-object-by-fields.ts"
         },
         {
-          "path": "registry/new-york/blocks/filter/filter.tsx",
+          "path": "registry/components/filter/filter.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/filter/filter.tsx"
         }
@@ -113,44 +113,64 @@
       ],
       "files": [
         {
-          "path": "registry/new-york/types/field.ts",
+          "path": "registry/types/field.ts",
           "type": "registry:file",
           "target": "components/turboost-ui/types/field.ts"
         },
         {
-          "path": "registry/new-york/blocks/index-table/utils/build-graphql-query-from-filter-values.ts",
+          "path": "registry/components/index-table/utils/build-graphql-query-from-filter-values.ts",
           "type": "registry:file",
           "target": "components/turboost-ui/index-table/utils/build-graphql-query-from-filter-values.ts"
         },
         {
-          "path": "registry/new-york/blocks/filter/utils/transform-object-by-fields.ts",
+          "path": "registry/components/filter/utils/transform-object-by-fields.ts",
           "type": "registry:file",
           "target": "components/turboost-ui/filter/utils/transform-object-by-fields.ts"
         },
         {
-          "path": "registry/new-york/blocks/filter/filter.tsx",
+          "path": "registry/components/filter/filter.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/filter/filter.tsx"
         },
         {
-          "path": "registry/new-york/blocks/table/table.tsx",
+          "path": "registry/components/table/table.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/table/table.tsx"
         },
         {
-          "path": "registry/new-york/blocks/view/view.tsx",
+          "path": "registry/components/view/view.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/view/view.tsx"
         },
         {
-          "path": "registry/new-york/blocks/index-table/order-direction-list.tsx",
+          "path": "registry/components/index-table/order-direction-list.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/index-table/order-direction-list.tsx"
         },
         {
-          "path": "registry/new-york/blocks/index-table/index-table.tsx",
+          "path": "registry/components/index-table/index-table.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/index-table/index-table.tsx"
+        }
+      ]
+    },
+    {
+      "name": "complex-filter",
+      "type": "registry:block",
+      "title": "Complex Filter",
+      "description": "A complex filter component with logical operators and nested conditions",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": [
+        "button",
+        "input",
+        "select",
+        "dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/components/complex-filter/complex-filter.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/complex-filter/complex-filter.tsx"
         }
       ]
     }
