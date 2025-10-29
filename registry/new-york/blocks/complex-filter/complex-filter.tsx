@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useMemo, useState, useRef, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -116,6 +116,45 @@ function isFilterGroup(
     typeof value === "object" &&
     (ComplexFilterLogical.AND in value || ComplexFilterLogical.OR in value)
   );
+}
+
+function isEmptyCondition(value: ComplexFilterCondition): boolean {
+  return Object.keys(value).length === 0;
+}
+
+function cleanFilterValue(
+  value: ComplexFilterValue
+): ComplexFilterValue | undefined {
+  if (isFilterGroup(value)) {
+    const logical = ComplexFilterLogical.AND in value
+      ? ComplexFilterLogical.AND
+      : ComplexFilterLogical.OR;
+    const items = value[logical];
+
+    if (!items) return undefined;
+
+    const cleanedItems = items
+      .map(item => cleanFilterValue(item))
+      .filter((item): item is ComplexFilterValue => item !== undefined);
+
+    if (cleanedItems.length === 0) return undefined;
+
+    return { [logical]: cleanedItems };
+  } else {
+    // 条件
+    if (isEmptyCondition(value)) return undefined;
+
+    // 检查条件是否有效（有字段、运算符和值）
+    const entries = Object.entries(value);
+    if (entries.length === 0) return undefined;
+
+    const [, operatorValuePair] = entries[0];
+    if (!operatorValuePair || Object.keys(operatorValuePair).length === 0) {
+      return undefined;
+    }
+
+    return value;
+  }
 }
 
 export interface ComplexFilterConditionRowProps {
@@ -394,24 +433,65 @@ export const ComplexFilter: FC<ComplexFilterProps> = ({
   value,
   onChange,
 }) => {
-  const [internalValue, setInternalValue] = useState<ComplexFilterValue>({
+  // 内部维护完整的 value（包括空条件），用于 UI 显示和编辑
+  const [internalDisplayValue, setInternalDisplayValue] = useState<ComplexFilterValue>({
     [ComplexFilterLogical.AND]: [],
   });
 
-  const currentValue = value ?? internalValue;
-  const handleChange = onChange ?? setInternalValue;
+  // 使用 ref 跟踪上一次的清理后的 value，避免循环更新
+  const lastCleanedValueRef = useRef<ComplexFilterValue | null>(null);
 
-  const handleClearAll = () => {
-    handleChange({ [ComplexFilterLogical.AND]: [] });
+  // 使用 ref 标记是否是内部更新，避免受控模式下的循环
+  const isInternalUpdateRef = useRef(false);
+
+  // 受控模式：当外部 value 变化时，需要同步到内部 displayValue
+  useEffect(() => {
+    // 如果是内部更新触发的，忽略
+    if (isInternalUpdateRef.current) {
+      isInternalUpdateRef.current = false;
+      return;
+    }
+
+    // 外部 value 变化，同步到内部
+    if (value !== undefined) {
+      setInternalDisplayValue(value);
+    }
+  }, [value]);
+
+  const handleChange = (newValue: ComplexFilterValue) => {
+    // 内部保存完整的 value（包括空条件）
+    setInternalDisplayValue(newValue);
+
+    // 对外输出时清理空条件
+    if (onChange) {
+      const cleaned = cleanFilterValue(newValue);
+      const finalValue = cleaned ?? { [ComplexFilterLogical.AND]: [] };
+
+      // 只在清理后的值真正改变时才调用 onChange
+      if (JSON.stringify(finalValue) !== JSON.stringify(lastCleanedValueRef.current)) {
+        lastCleanedValueRef.current = finalValue;
+        isInternalUpdateRef.current = true;
+        onChange(finalValue);
+      }
+    }
   };
 
-  if (isFilterGroup(currentValue)) {
+  const handleClearAll = () => {
+    const emptyValue = { [ComplexFilterLogical.AND]: [] };
+    setInternalDisplayValue(emptyValue);
+    if (onChange) {
+      isInternalUpdateRef.current = true;
+      onChange(emptyValue);
+    }
+  };
+
+  if (isFilterGroup(internalDisplayValue)) {
     return (
       <div className="space-y-4">
         <ComplexFilterGroup
           i18n={i18n}
           filters={filters}
-          value={currentValue}
+          value={internalDisplayValue}
           onChange={handleChange}
         />
         <div className="flex justify-end">
