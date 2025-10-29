@@ -118,10 +118,6 @@ function isFilterGroup(
   );
 }
 
-function isEmptyCondition(value: ComplexFilterCondition): boolean {
-  return Object.keys(value).length === 0;
-}
-
 function cleanFilterValue(
   value: ComplexFilterValue
 ): ComplexFilterValue | undefined {
@@ -141,9 +137,6 @@ function cleanFilterValue(
 
     return { [logical]: cleanedItems };
   } else {
-    // 条件
-    if (isEmptyCondition(value)) return undefined;
-
     // 检查条件是否有效（有字段、运算符和值）
     const entries = Object.entries(value);
     if (entries.length === 0) return undefined;
@@ -273,7 +266,6 @@ export interface ComplexFilterGroupProps {
   value: ComplexFilterGroupValue;
   onChange: (value: ComplexFilterGroupValue) => void;
   onRemove?: () => void;
-  depth?: number;
 }
 
 export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
@@ -282,7 +274,6 @@ export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
   value,
   onChange,
   onRemove,
-  depth = 0,
 }) => {
   const [logical, items]: [ComplexFilterLogical, ComplexFilterValue[]] =
     useMemo(() => {
@@ -373,7 +364,6 @@ export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
                       value={item}
                       onChange={(newValue) => handleItemChange(index, newValue)}
                       onRemove={() => handleItemRemove(index)}
-                      depth={depth + 1}
                     />
                   ) : (
                     <ComplexFilterConditionRow
@@ -438,23 +428,21 @@ export const ComplexFilter: FC<ComplexFilterProps> = ({
     [ComplexFilterLogical.AND]: [],
   });
 
-  // 使用 ref 跟踪上一次的清理后的 value，避免循环更新
-  const lastCleanedValueRef = useRef<ComplexFilterValue | null>(null);
-
-  // 使用 ref 标记是否是内部更新，避免受控模式下的循环
-  const isInternalUpdateRef = useRef(false);
+  // 使用 ref 跟踪上一次清理后的 value 的字符串表示，用于去重
+  const lastCleanedValueStrRef = useRef<string>("");
 
   // 受控模式：当外部 value 变化时，需要同步到内部 displayValue
+  // 注意：只在外部真正变化时同步，避免因内部触发 onChange 导致的循环
   useEffect(() => {
-    // 如果是内部更新触发的，忽略
-    if (isInternalUpdateRef.current) {
-      isInternalUpdateRef.current = false;
-      return;
-    }
-
-    // 外部 value 变化，同步到内部
     if (value !== undefined) {
-      setInternalDisplayValue(value);
+      const currentCleanedStr = lastCleanedValueStrRef.current;
+      const externalValueStr = JSON.stringify(value);
+
+      // 只有当外部值与上次输出的清理值不同时才同步
+      // 这避免了因为我们输出清理值导致的无意义同步
+      if (externalValueStr !== currentCleanedStr) {
+        setInternalDisplayValue(value);
+      }
     }
   }, [value]);
 
@@ -466,11 +454,11 @@ export const ComplexFilter: FC<ComplexFilterProps> = ({
     if (onChange) {
       const cleaned = cleanFilterValue(newValue);
       const finalValue = cleaned ?? { [ComplexFilterLogical.AND]: [] };
+      const finalValueStr = JSON.stringify(finalValue);
 
       // 只在清理后的值真正改变时才调用 onChange
-      if (JSON.stringify(finalValue) !== JSON.stringify(lastCleanedValueRef.current)) {
-        lastCleanedValueRef.current = finalValue;
-        isInternalUpdateRef.current = true;
+      if (finalValueStr !== lastCleanedValueStrRef.current) {
+        lastCleanedValueStrRef.current = finalValueStr;
         onChange(finalValue);
       }
     }
@@ -480,7 +468,8 @@ export const ComplexFilter: FC<ComplexFilterProps> = ({
     const emptyValue = { [ComplexFilterLogical.AND]: [] };
     setInternalDisplayValue(emptyValue);
     if (onChange) {
-      isInternalUpdateRef.current = true;
+      const emptyValueStr = JSON.stringify(emptyValue);
+      lastCleanedValueStrRef.current = emptyValueStr;
       onChange(emptyValue);
     }
   };
