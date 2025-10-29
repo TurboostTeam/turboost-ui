@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { ComplexFilter, ComplexFilterType, ComplexFilterValue } from "./complex-filter";
+import {
+  ComplexFilter,
+  ComplexFilterType,
+  ComplexFilterValue,
+} from "./complex-filter";
 import { useState } from "react";
 
 const meta = {
@@ -19,10 +23,7 @@ const ComplexFilterWithState = () => {
     $and: [
       { name: { $eq: "未完成" } },
       {
-        $or: [
-          { status: { $eq: "未完成" } },
-          { age: { $lt: "18" } },
-        ],
+        $or: [{ status: { $eq: "未完成" } }, { age: { $lt: "18" } }],
       },
     ],
   });
@@ -71,6 +72,9 @@ const ComplexFilterWithState = () => {
 };
 
 export const Default: Story = {
+  args: {
+    filters: [],
+  },
   render: () => <ComplexFilterWithState />,
 };
 
@@ -111,10 +115,7 @@ export const WithInitialValue: Story = {
       },
     ],
     value: {
-      $and: [
-        { name: { $eq: "Joe" } },
-        { age: { $lt: "18" } },
-      ],
+      $and: [{ name: { $eq: "Joe" } }, { age: { $lt: "18" } }],
     },
   },
 };

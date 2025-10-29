@@ -1,4 +1,4 @@
-import { FilterItemProps } from "@/registry/new-york/blocks/filter/filter";
+import { FilterItemProps } from "@/registry/components/filter/filter";
 
 export type TypeValue =
   | StringConstructor

@@ -1,4 +1,4 @@
-import { Table } from "@/registry/new-york/blocks/table/table";
+import { Table } from "@/registry/components/table/table";
 
 export function TablePreview() {
   return (

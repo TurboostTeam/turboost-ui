@@ -1,4 +1,4 @@
-import { Filter } from "@/registry/new-york/blocks/filter/filter";
+import { Filter } from "@/registry/components/filter/filter";
 import { Input } from "@/components/ui/input";
 import { Info, Search } from "lucide-react";
 

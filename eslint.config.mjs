@@ -14,13 +14,12 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
-  ...compat.plugins("eslint-plugin-next-on-pages"),
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
     },
   },
-  ...storybook.configs["flat/recommended"]
+  ...storybook.configs["flat/recommended"],
 ];
 
 export default eslintConfig;

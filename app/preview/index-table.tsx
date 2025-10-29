@@ -1,4 +1,4 @@
-import { IndexTable } from "@/registry/new-york/blocks/index-table/index-table";
+import { IndexTable } from "@/registry/components/index-table/index-table";
 
 export default function IndexTablePreview() {
   const columns = [
