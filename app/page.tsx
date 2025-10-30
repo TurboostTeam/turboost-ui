@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <Tabs
       defaultValue={components[0]?.name}
-      className="w-full h-full p-4 flex gap-4 items-center"
+      className="flex h-full w-full items-center gap-4 p-4"
     >
       <div className="w-fit space-y-2">
         <h1 className="text-lg font-semibold">组件分类</h1>
@@ -48,7 +48,7 @@ export default function Home() {
           <TabsContent
             key={component.name}
             value={component.name}
-            className="bg-white border rounded-lg p-4"
+            className="rounded-lg border bg-white p-4"
           >
             <h1 className="pb-2 font-semibold">组件名: {component.name}</h1>
             {component.content}

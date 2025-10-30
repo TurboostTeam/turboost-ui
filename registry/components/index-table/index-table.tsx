@@ -128,7 +128,7 @@ export interface ActionType {
   reloadAndRest: () => void;
   setFilterValues: (
     filterValues: Record<string, any>,
-    syncToUrl?: boolean
+    syncToUrl?: boolean,
   ) => void;
 }
 
@@ -148,7 +148,7 @@ export interface IndexTableProps<Node, OrderField> {
     onSelectionChange?: (rows: Node[]) => void;
     bulkActions?: (
       rows: Node[],
-      isSelectedAll: boolean
+      isSelectedAll: boolean,
     ) => React.ComponentProps<"button">[];
   };
   bodyHeight?: {
@@ -181,7 +181,7 @@ export interface IndexTableProps<Node, OrderField> {
 
 const getFilterFiledTypeParse = (
   type: FilterTypeValue,
-  itemType?: FilterTypeValue
+  itemType?: FilterTypeValue,
 ): ParserBuilder<any> => {
   switch (type) {
     case String:
@@ -197,8 +197,8 @@ const getFilterFiledTypeParse = (
         typeof itemType === "undefined"
           ? parseAsString
           : itemType === Date
-          ? (parseAsIsoDateTime as unknown as ParserBuilder<string>)
-          : getFilterFiledTypeParse(itemType)
+            ? (parseAsIsoDateTime as unknown as ParserBuilder<string>)
+            : getFilterFiledTypeParse(itemType),
       );
     default:
       return parseAsString;
@@ -252,18 +252,18 @@ export function IndexTable<Node, OrderField extends string>({
   }, [filterValues, filters]);
 
   const [pagination, setPagination] = useState<IndexTablePagination>(
-    pick(value, ["first", "after", "last", "before"])
+    pick(value, ["first", "after", "last", "before"]),
   );
 
   const [orderField, setOrderField] = useState(value?.orderBy?.field);
   const [orderDirection, setOrderDirection] = useState(
-    value?.orderBy?.direction
+    value?.orderBy?.direction,
   );
 
   // 是否启用视图
   const enabledView = useMemo(
     () => Boolean(viewConfig?.items?.length),
-    [viewConfig]
+    [viewConfig],
   );
 
   const [urlQueryStates, setUrlQueryStates] = useQueryStates(
@@ -277,15 +277,15 @@ export function IndexTable<Node, OrderField extends string>({
               ? parseAsString
               : getFilterFiledTypeParse(
                   currentFilter.type,
-                  currentFilter.itemType
+                  currentFilter.itemType,
                 );
 
           return result;
         },
-        {}
+        {},
       ),
     },
-    { history: "push" }
+    { history: "push" },
   );
 
   // nuqs 包对监听的属性值默认设置为 null（无论是否存在于 url 上），所以需要过滤掉 null 和 undefined 的 url 查询参数，供过滤组件使用
@@ -314,19 +314,19 @@ export function IndexTable<Node, OrderField extends string>({
       },
       setFilterValues: async (
         filterValues: Record<Field<Node>, any>,
-        syncToUrl = false
+        syncToUrl = false,
       ) => {
         if (syncToUrl) {
           const needClearFields = difference(
             keys(transformedParams),
-            keys(filterValues)
+            keys(filterValues),
           );
 
           await setUrlQueryStates({
             ...filterValues,
             ...zipObject(
               needClearFields,
-              Array(needClearFields.length).fill(null)
+              Array(needClearFields.length).fill(null),
             ),
             selectedView: null,
           });
@@ -335,7 +335,7 @@ export function IndexTable<Node, OrderField extends string>({
         }
       },
     }),
-    [setUrlQueryStates, transformedParams]
+    [setUrlQueryStates, transformedParams],
   );
 
   const handlePrevClick = useCallback(() => {
@@ -370,7 +370,7 @@ export function IndexTable<Node, OrderField extends string>({
       setShowCreateViewDialog(false);
       currentSelectedViewKeyRef.current = undefined;
     },
-    [createViewForm, filterValues, viewConfig]
+    [createViewForm, filterValues, viewConfig],
   );
 
   // 处理视图保存
@@ -393,7 +393,7 @@ export function IndexTable<Node, OrderField extends string>({
         typeof viewConfig.items.find(
           (item) =>
             item.key === currentSelectedViewKeyRef.current &&
-            item.canEdit !== false
+            item.canEdit !== false,
         ) !== "undefined"
       ) {
         await viewConfig?.onSave?.(currentSelectedViewKeyRef.current, config);
@@ -421,7 +421,7 @@ export function IndexTable<Node, OrderField extends string>({
       if (
         !(
           filters.some(
-            (item) => typeof usefulQueryStates?.[item.field] !== "undefined"
+            (item) => typeof usefulQueryStates?.[item.field] !== "undefined",
           ) || typeof usefulQueryStates?.query !== "undefined"
         )
       ) {
@@ -449,7 +449,7 @@ export function IndexTable<Node, OrderField extends string>({
       if (
         typeof viewConfig !== "undefined" &&
         !viewConfig.items.some(
-          (item) => item.key === usefulQueryStates.selectedView
+          (item) => item.key === usefulQueryStates.selectedView,
         )
       ) {
         // 没有符合的过滤项，则将视图参数设置为第一个视图
@@ -590,7 +590,7 @@ export function IndexTable<Node, OrderField extends string>({
                         ) {
                           // 没有符合的过滤项，则将视图参数设置为第一个视图
                           const params = new URLSearchParams(
-                            window.location.search
+                            window.location.search,
                           );
 
                           const needClearFields = Array.from(params.keys());
@@ -606,7 +606,7 @@ export function IndexTable<Node, OrderField extends string>({
                             typeof currentSelectedViewKeyRef.current !==
                               "undefined"
                               ? currentSelectedViewKeyRef.current
-                              : viewConfig!.items[0].key
+                              : viewConfig!.items[0].key,
                           );
 
                           window.history.pushState(null, "", url.toString());
@@ -616,7 +616,7 @@ export function IndexTable<Node, OrderField extends string>({
                           setFilterValues(
                             typeof filterValues === "undefined"
                               ? undefined
-                              : { ...filterValues }
+                              : { ...filterValues },
                           );
                           currentSelectedViewKeyRef.current = undefined;
                         }
@@ -636,7 +636,8 @@ export function IndexTable<Node, OrderField extends string>({
                       {viewConfig?.loading ? (
                         <Spinner />
                       ) : (
-                        translate("turboost_ui.index_table.view.save") ?? "Save"
+                        (translate("turboost_ui.index_table.view.save") ??
+                        "Save")
                       )}
                     </Button>
                   </div>
@@ -653,7 +654,7 @@ export function IndexTable<Node, OrderField extends string>({
                 if (!isEqual(result, transformedParams)) {
                   const needClearFields = difference(
                     keys(transformedParams),
-                    keys(result)
+                    keys(result),
                   );
 
                   setUrlQueryStates(
@@ -661,7 +662,7 @@ export function IndexTable<Node, OrderField extends string>({
                       ? {
                           ...zipObject(
                             needClearFields,
-                            Array(needClearFields.length).fill(null)
+                            Array(needClearFields.length).fill(null),
                           ),
                           selectedView:
                             typeof currentSelectedViewKeyRef.current !==
@@ -673,10 +674,10 @@ export function IndexTable<Node, OrderField extends string>({
                           ...result,
                           ...zipObject(
                             needClearFields,
-                            Array(needClearFields.length).fill(null)
+                            Array(needClearFields.length).fill(null),
                           ),
                           selectedView: null,
-                        }
+                        },
                   );
                 }
               } else {
@@ -770,7 +771,7 @@ export function IndexTable<Node, OrderField extends string>({
                 rules={{
                   required:
                     translate(
-                      "turboost_ui.index_table.view.create_dialog.form.name_field.rule.required"
+                      "turboost_ui.index_table.view.create_dialog.form.name_field.rule.required",
                     ) ?? "View name is required",
                 }}
                 control={createViewForm.control}
@@ -778,7 +779,7 @@ export function IndexTable<Node, OrderField extends string>({
                   <FormItem>
                     <FormLabel>
                       {translate(
-                        "turboost_ui.index_table.view.create_dialog.form.name_field.label"
+                        "turboost_ui.index_table.view.create_dialog.form.name_field.label",
                       ) ?? "View Name"}
                     </FormLabel>
                     <FormControl>
@@ -786,7 +787,7 @@ export function IndexTable<Node, OrderField extends string>({
                         {...field}
                         placeholder={
                           translate(
-                            "turboost_ui.index_table.view.create_dialog.form.name_field.placeholder"
+                            "turboost_ui.index_table.view.create_dialog.form.name_field.placeholder",
                           ) ?? "Please enter view name"
                         }
                         maxLength={40}
@@ -802,9 +803,9 @@ export function IndexTable<Node, OrderField extends string>({
                   {viewConfig?.loading ? (
                     <Spinner />
                   ) : (
-                    translate(
-                      "turboost_ui.index_table.view.create_dialog.form.submit_btn.content"
-                    ) ?? "Save"
+                    (translate(
+                      "turboost_ui.index_table.view.create_dialog.form.submit_btn.content",
+                    ) ?? "Save")
                   )}
                 </Button>
               </DialogFooter>

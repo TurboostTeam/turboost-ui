@@ -1,7 +1,7 @@
 "use client";
 
-import { ChevronDown, Plus,X } from "lucide-react";
-import { FC, useEffect,useMemo, useRef, useState } from "react";
+import { ChevronDown, Plus, X } from "lucide-react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -113,7 +113,7 @@ export const defaultComplexFilterI18n: ComplexFilterI18n = {
 };
 
 function isFilterGroup(
-  value: ComplexFilterValue
+  value: ComplexFilterValue,
 ): value is ComplexFilterGroupValue {
   return (
     value !== null &&
@@ -123,7 +123,7 @@ function isFilterGroup(
 }
 
 function cleanFilterValue(
-  value: ComplexFilterValue
+  value: ComplexFilterValue,
 ): ComplexFilterValue | undefined {
   if (isFilterGroup(value)) {
     const logical =
@@ -184,7 +184,7 @@ export const ComplexFilterConditionRow: FC<ComplexFilterConditionRowProps> = ({
   const [field, operatorValuePair] = useMemo<
     [
       string | undefined,
-      Partial<Record<ComplexFilterOperator, any>> | undefined
+      Partial<Record<ComplexFilterOperator, any>> | undefined,
     ]
   >(() => {
     const entries = Object.entries(value);
@@ -203,12 +203,12 @@ export const ComplexFilterConditionRow: FC<ComplexFilterConditionRowProps> = ({
 
   const selectedFilter = useMemo(
     () => filters.find((filter) => filter.field === field),
-    [filters, field]
+    [filters, field],
   );
 
   const operators = useMemo(() => {
     return selectedFilter
-      ? selectedFilter.operators ?? filterOperators[selectedFilter.type]
+      ? (selectedFilter.operators ?? filterOperators[selectedFilter.type])
       : [];
   }, [selectedFilter]);
 
@@ -343,20 +343,20 @@ export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
 
   return (
     <div className="flex gap-2">
-      <div className="flex-1 bg-background rounded-lg border p-4">
+      <div className="bg-background flex-1 rounded-lg border p-4">
         {items.length > 0 && (
-          <div className="flex gap-2 mb-4">
+          <div className="mb-4 flex gap-2">
             {/* 左侧大括号连接线 + 逻辑运算符按钮 */}
             {items.length > 1 && (
-              <div className="flex flex-col w-10 pl-4 py-4">
+              <div className="flex w-10 flex-col py-4 pl-4">
                 {/* 上半部分 - 顶部圆角 + 垂直线 */}
-                <div className="border-l-2 border-t-2 border-border rounded-tl-md w-full flex-1" />
+                <div className="border-border w-full flex-1 rounded-tl-md border-t-2 border-l-2" />
 
                 {/* 逻辑运算符按钮 - 居中放置 */}
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-xs -translate-x-1/2"
+                  className="-translate-x-1/2 text-xs"
                   onClick={() => {
                     const newLogical =
                       logical === ComplexFilterLogical.AND
@@ -370,7 +370,7 @@ export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
 
                 {/* 下半部分 - 垂直线 + 底部圆角 */}
                 <div
-                  className="border-l-2 border-b-2 border-border rounded-bl-md w-full flex-1"
+                  className="border-border w-full flex-1 rounded-bl-md border-b-2 border-l-2"
                   style={{ height: "calc(50% - 18px)" }}
                 />
               </div>
@@ -407,9 +407,9 @@ export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="h-8">
-                <Plus className="h-4 w-4 mr-1" />
+                <Plus className="mr-1 h-4 w-4" />
                 {i18n.addCondition}
-                <ChevronDown className="h-4 w-4 ml-1" />
+                <ChevronDown className="ml-1 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">

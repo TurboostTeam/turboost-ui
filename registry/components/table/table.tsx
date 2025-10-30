@@ -68,7 +68,7 @@ export interface TableProps<T> {
     onSelectionChange?: (rows: T[]) => void;
     bulkActions?: (
       rows: T[],
-      isSelectedAll: boolean
+      isSelectedAll: boolean,
     ) => React.ComponentProps<"button">[];
   };
   data: T[];
@@ -126,7 +126,7 @@ export function Table<T>({
           (column) =>
             typeof column.pin !== "undefined" &&
             typeof column.pin !== "boolean" &&
-            ["left", "right"].includes(column.pin)
+            ["left", "right"].includes(column.pin),
         )
           ? "left"
           : undefined,
@@ -138,12 +138,12 @@ export function Table<T>({
                     table.getIsAllRowsSelected()
                       ? true
                       : Object.keys(internalRowSelection).length > 0
-                      ? "indeterminate"
-                      : false
+                        ? "indeterminate"
+                        : false
                   }
                   onCheckedChange={(value) => {
                     table.toggleAllRowsSelected(
-                      [false, "indeterminate"].includes(value) ? false : true
+                      [false, "indeterminate"].includes(value) ? false : true,
                     );
                   }}
                 />
@@ -182,7 +182,7 @@ export function Table<T>({
             ...column,
             id: (column as AccessorKeyColumnDef<T>).accessorKey,
           }
-        : column
+        : column,
     );
   }, [columns, internalRowSelection, rowSelection]);
 
@@ -193,7 +193,7 @@ export function Table<T>({
       rowSelection: internalRowSelection,
       columnPinning: reduce(
         memoColumns.filter(
-          (column) => typeof column.pin !== "undefined" && column.pin !== false
+          (column) => typeof column.pin !== "undefined" && column.pin !== false,
         ),
         (acc: Record<string, string[]>, column) => {
           if (
@@ -204,12 +204,12 @@ export function Table<T>({
           }
 
           acc[column.pin as keyof typeof column.pin].push(
-            (column as AccessorKeyColumnDef<T>).id!
+            (column as AccessorKeyColumnDef<T>).id!,
           );
 
           return acc;
         },
-        {}
+        {},
       ),
     },
     enableRowSelection: typeof rowSelection !== "undefined",
@@ -220,7 +220,7 @@ export function Table<T>({
           updater instanceof Function ? updater(old) : updater;
 
         rowSelection?.onSelectionChange?.(
-          Object.keys(newRowSelection).map((key) => table.getRow(key).original)
+          Object.keys(newRowSelection).map((key) => table.getRow(key).original),
         );
 
         setIsRowSelectedAll(false);
@@ -238,9 +238,9 @@ export function Table<T>({
           .map((header) => ({
             direction: header.column.getIsPinned(),
             size: header.column.getSize(),
-          }))
+          })),
       )[0],
-      "direction"
+      "direction",
     );
   }, [table]);
 
@@ -248,7 +248,7 @@ export function Table<T>({
     (pinnedIndex: number, direction: "left" | "right") => {
       if (direction === "left") {
         return sum(
-          columnsPinnedInfo.left.map((item) => item.size).slice(0, pinnedIndex)
+          columnsPinnedInfo.left.map((item) => item.size).slice(0, pinnedIndex),
         );
       }
 
@@ -257,11 +257,11 @@ export function Table<T>({
           columnsPinnedInfo.right
             .map((item) => item.size)
             .reverse()
-            .slice(0, table.getRightLeafColumns().length - pinnedIndex - 1)
+            .slice(0, table.getRightLeafColumns().length - pinnedIndex - 1),
         );
       }
     },
-    [columnsPinnedInfo, table]
+    [columnsPinnedInfo, table],
   );
 
   // 一些可以手动触发的特殊操作
@@ -272,14 +272,14 @@ export function Table<T>({
         table.resetRowSelection();
       },
     }),
-    [table]
+    [table],
   );
 
   return (
     <div
       className={cn(
         "relative min-w-full",
-        loading && "pointer-events-none overflow-hidden select-none"
+        loading && "pointer-events-none overflow-hidden select-none",
       )}
     >
       <div className="overflow-hidden" ref={tableHeaderRef}>
@@ -296,14 +296,14 @@ export function Table<T>({
                         table.getIsAllRowsSelected()
                           ? true
                           : Object.keys(internalRowSelection).length > 0
-                          ? "indeterminate"
-                          : false
+                            ? "indeterminate"
+                            : false
                       }
                       onCheckedChange={(value) => {
                         table.toggleAllRowsSelected(
                           [false, "indeterminate"].includes(value)
                             ? false
-                            : true
+                            : true,
                         );
                       }}
                     />
@@ -311,18 +311,18 @@ export function Table<T>({
 
                   <td className="text-foreground text-sm">
                     {isRowSelectedAll
-                      ? translate(
-                          "turboost_ui.table.batch_actions.selected_all"
-                        ) ?? "Selected all"
-                      : translate(
+                      ? (translate(
+                          "turboost_ui.table.batch_actions.selected_all",
+                        ) ?? "Selected all")
+                      : (translate(
                           "turboost_ui.table.batch_actions.selected_rows",
                           {
                             rows: Object.keys(internalRowSelection).length,
-                          }
+                          },
                         ) ??
                         `Selected ${
                           Object.keys(internalRowSelection).length
-                        } rows`}
+                        } rows`)}
                   </td>
 
                   {typeof rowSelection?.allowSelectAll !== "undefined" &&
@@ -345,12 +345,12 @@ export function Table<T>({
                           }}
                         >
                           {isRowSelectedAll
-                            ? translate(
-                                "turboost_ui.table.batch_actions.cancel"
-                              ) ?? "Cancel"
-                            : translate(
-                                "turboost_ui.table.batch_actions.select_all"
-                              ) ?? "Select all"}
+                            ? (translate(
+                                "turboost_ui.table.batch_actions.cancel",
+                              ) ?? "Cancel")
+                            : (translate(
+                                "turboost_ui.table.batch_actions.select_all",
+                              ) ?? "Select all")}
                         </Button>
                       </td>
                     )}
@@ -359,9 +359,9 @@ export function Table<T>({
                     {rowSelection
                       ?.bulkActions?.(
                         Object.keys(internalRowSelection).map(
-                          (key) => table.getRow(key).original
+                          (key) => table.getRow(key).original,
                         ),
-                        isRowSelectedAll
+                        isRowSelectedAll,
                       )
                       ?.map((action, index) => (
                         <div key={index}>
@@ -404,7 +404,7 @@ export function Table<T>({
                         header.column.getIsPinned() === "right" &&
                           header.column.getPinnedIndex() ===
                             table.getRightLeafColumns().length - 1 &&
-                          "drop-shadow-[-1px_0_0_#e5e7eb]"
+                          "drop-shadow-[-1px_0_0_#e5e7eb]",
                       )}
                       key={header.id}
                       style={{
@@ -414,7 +414,7 @@ export function Table<T>({
                           columnsPinnedInfo.left?.length > 0
                             ? getColumnPinedOffset(
                                 header.column.getPinnedIndex(),
-                                "left"
+                                "left",
                               )
                             : undefined,
                         right:
@@ -422,7 +422,7 @@ export function Table<T>({
                           columnsPinnedInfo.right?.length > 0
                             ? getColumnPinedOffset(
                                 header.column.getPinnedIndex(),
-                                "right"
+                                "right",
                               )
                             : undefined,
                       }}
@@ -431,7 +431,7 @@ export function Table<T>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </th>
                   );
@@ -446,7 +446,7 @@ export function Table<T>({
         className={cn(
           typeof bodyHeight !== "undefined"
             ? "overflow-auto"
-            : "overflow-y-hidden"
+            : "overflow-y-hidden",
         )}
         style={{
           minHeight:
@@ -476,7 +476,7 @@ export function Table<T>({
               <tr
                 className={cn(
                   "group bg-background",
-                  onRow != null && "cursor-pointer"
+                  onRow != null && "cursor-pointer",
                 )}
                 key={row.id}
                 onClick={(e) => {
@@ -507,7 +507,7 @@ export function Table<T>({
                       cell.column.getIsPinned() === "right" &&
                         cell.column.getPinnedIndex() ===
                           table.getRightLeafColumns().length - 1 &&
-                        "drop-shadow-[-1px_0_0_#e5e7eb]"
+                        "drop-shadow-[-1px_0_0_#e5e7eb]",
                     )}
                     key={cell.id}
                     style={{
@@ -517,7 +517,7 @@ export function Table<T>({
                         columnsPinnedInfo.left?.length > 0
                           ? getColumnPinedOffset(
                               cell.column.getPinnedIndex(),
-                              "left"
+                              "left",
                             )
                           : undefined,
                       right:
@@ -525,7 +525,7 @@ export function Table<T>({
                         columnsPinnedInfo.right?.length > 0
                           ? getColumnPinedOffset(
                               cell.column.getPinnedIndex(),
-                              "right"
+                              "right",
                             )
                           : undefined,
                     }}
@@ -587,7 +587,7 @@ export function Table<T>({
                         header.column.getIsPinned() === "right" &&
                           header.column.getPinnedIndex() ===
                             table.getRightLeafColumns().length - 1 &&
-                          "drop-shadow-[-1px_0_0_#e5e7eb]"
+                          "drop-shadow-[-1px_0_0_#e5e7eb]",
                       )}
                       key={header.id}
                       style={{
@@ -597,7 +597,7 @@ export function Table<T>({
                           columnsPinnedInfo.left?.length > 0
                             ? getColumnPinedOffset(
                                 header.column.getPinnedIndex(),
-                                "left"
+                                "left",
                               )
                             : undefined,
                         right:
@@ -605,7 +605,7 @@ export function Table<T>({
                           columnsPinnedInfo.right?.length > 0
                             ? getColumnPinedOffset(
                                 header.column.getPinnedIndex(),
-                                "right"
+                                "right",
                               )
                             : undefined,
                       }}
@@ -614,7 +614,7 @@ export function Table<T>({
                         ? null
                         : flexRender(
                             header.column.columnDef.footer,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </th>
                   ))}
@@ -626,7 +626,7 @@ export function Table<T>({
       )}
 
       {loading && (
-        <div className="bg-background absolute top-0 left-0 w-full h-full z-10 opacity-50">
+        <div className="bg-background absolute top-0 left-0 z-10 h-full w-full opacity-50">
           <Spinner className="absolute top-0 right-0 bottom-0 left-0 z-10 m-auto" />
         </div>
       )}

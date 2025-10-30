@@ -10,7 +10,7 @@ export type TypeValue =
 export const transformTypeValue = (
   value: any,
   type?: TypeValue,
-  itemType?: TypeValue
+  itemType?: TypeValue,
 ): any => {
   if (typeof type === "undefined") {
     return value;
@@ -48,7 +48,7 @@ export const transformTypeValue = (
 
 export const transformObjectByFields = (
   obj: Record<string, any>,
-  filters: FilterItemProps<any>[]
+  filters: FilterItemProps<any>[],
 ): Record<string, any> => {
   const result: Record<string, any> = {};
 

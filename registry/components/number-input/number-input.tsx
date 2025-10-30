@@ -14,7 +14,7 @@ export type NumberInputProps = Omit<
 const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
   (props, ref) => {
     return <NumericFormat getInputRef={ref} customInput={Input} {...props} />;
-  }
+  },
 );
 
 NumberInput.displayName = "NumberInput";

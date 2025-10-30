@@ -6,7 +6,7 @@ import { Field } from "@/registry/types/field";
 
 export function buildGraphqlQueryFromFilterValues<Node>(
   filters: FilterItemProps<Node>[],
-  filterValues?: Record<Field<Node>, any>
+  filterValues?: Record<Field<Node>, any>,
 ): string {
   return compact([
     trim((filterValues as any)?.query),
@@ -58,7 +58,7 @@ export function buildGraphqlQueryFromFilterValues<Node>(
         }
 
         return result;
-      }, "")
+      }, ""),
     ),
   ])
     .map((item) => `(${item})`)

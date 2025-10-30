@@ -29,13 +29,13 @@ export const OrderDirectionList: FC<OrderDirectionListProps> = ({
   const [options] = useState([
     {
       label: translate(
-        "turboost_ui.index_table.order_direction_list.sort_option.oldest_first"
+        "turboost_ui.index_table.order_direction_list.sort_option.oldest_first",
       ),
       value: OrderDirection.ASC,
     },
     {
       label: translate(
-        "turboost_ui.index_table.order_direction_list.sort_option.newest_first"
+        "turboost_ui.index_table.order_direction_list.sort_option.newest_first",
       ),
       value: OrderDirection.DESC,
     },
@@ -48,7 +48,7 @@ export const OrderDirectionList: FC<OrderDirectionListProps> = ({
           <Button
             className={cn(
               "justify-start",
-              option.value === value ? "text-primary bg-accent" : undefined
+              option.value === value ? "text-primary bg-accent" : undefined,
             )}
             key={option.value}
             size="sm"

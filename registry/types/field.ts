@@ -9,11 +9,11 @@ type Join<K, P> = K extends string | number
 export type Field<T, D extends Prev[number] = 3> = [D] extends [never]
   ? never
   : T extends object
-  ? {
-      [K in keyof T]-?: K extends string | number
-        ? T[K] extends Date
-          ? `${K}`
-          : Join<K, Field<T[K], Prev[D]>>
-        : never;
-    }[keyof T]
-  : "";
+    ? {
+        [K in keyof T]-?: K extends string | number
+          ? T[K] extends Date
+            ? `${K}`
+            : Join<K, Field<T[K], Prev[D]>>
+          : never;
+      }[keyof T]
+    : "";

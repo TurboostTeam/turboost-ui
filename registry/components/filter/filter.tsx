@@ -68,7 +68,7 @@ const formatRenderValue = (obj: any): any => {
           value instanceof Date ? dayjs(value).format("YYYY-MM-DD") : value;
       }
     },
-    {}
+    {},
   );
 };
 
@@ -85,7 +85,7 @@ const flattenObject = (obj: any): any => {
         result[key] = value;
       }
     },
-    {}
+    {},
   );
 };
 
@@ -190,7 +190,7 @@ export function Filter<T>({
         };
       });
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -312,7 +312,7 @@ export function Filter<T>({
                                   })
                                 : formatRenderValue({ [field]: fieldValue })[
                                     field
-                                  ]
+                                  ],
                             )}`}
                           </span>
 

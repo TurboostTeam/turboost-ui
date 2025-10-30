@@ -57,7 +57,7 @@ export interface ViewProps {
   onEdit?: (
     key: string,
     type: ViewItemEditType,
-    payload?: { label: string }
+    payload?: { label: string },
   ) => void;
   onActiveChange?: (key: string) => void;
   t?: Function;
@@ -113,7 +113,7 @@ export function View({
       setCreateViewDialogOpen(false);
       createViewForm.reset();
     },
-    [createViewForm, onAdd]
+    [createViewForm, onAdd],
   );
 
   const handleRenameView = useCallback(
@@ -126,7 +126,7 @@ export function View({
         renameViewForm.reset();
       }
     },
-    [selectedView, onEdit, renameViewForm]
+    [selectedView, onEdit, renameViewForm],
   );
 
   const handleDeleteView = useCallback(async () => {
@@ -140,7 +140,7 @@ export function View({
   const generateActionableButton = useCallback(
     (
       activator: ReactElement,
-      { key, canDelete = true }: ViewItem
+      { key, canDelete = true }: ViewItem,
     ): ReactElement => {
       return (
         <DropdownMenu key={key}>
@@ -168,7 +168,7 @@ export function View({
         </DropdownMenu>
       );
     },
-    [setDeleteViewDialogOpen, setRenameViewDialogOpen, translate]
+    [setDeleteViewDialogOpen, setRenameViewDialogOpen, translate],
   );
 
   return (
@@ -236,7 +236,7 @@ export function View({
                   rules={{
                     required:
                       translate(
-                        "turboost_ui.view.create_view_dialog.form.name_field.rule.required"
+                        "turboost_ui.view.create_view_dialog.form.name_field.rule.required",
                       ) ?? "Name is required",
                   }}
                   control={createViewForm.control}
@@ -244,7 +244,7 @@ export function View({
                     <FormItem>
                       <FormLabel>
                         {translate(
-                          "turboost_ui.view.create_view_dialog.form.name_field.label"
+                          "turboost_ui.view.create_view_dialog.form.name_field.label",
                         ) ?? "Name"}
                       </FormLabel>
                       <FormControl>
@@ -252,7 +252,7 @@ export function View({
                           {...field}
                           placeholder={
                             translate(
-                              "turboost_ui.view.create_view_dialog.form.name_field.placeholder"
+                              "turboost_ui.view.create_view_dialog.form.name_field.placeholder",
                             ) ?? "Please enter view name"
                           }
                           maxLength={40}
@@ -268,9 +268,9 @@ export function View({
                     {loading ? (
                       <Spinner />
                     ) : (
-                      translate(
-                        "turboost_ui.view.create_view_dialog.form.submit_btn.content"
-                      ) ?? "Save"
+                      (translate(
+                        "turboost_ui.view.create_view_dialog.form.submit_btn.content",
+                      ) ?? "Save")
                     )}
                   </Button>
                 </DialogFooter>
@@ -303,7 +303,7 @@ export function View({
                 rules={{
                   required:
                     translate(
-                      "turboost_ui.view.rename_view_dialog.form.name_field.rule.required"
+                      "turboost_ui.view.rename_view_dialog.form.name_field.rule.required",
                     ) ?? "Name is required",
                 }}
                 control={renameViewForm.control}
@@ -311,7 +311,7 @@ export function View({
                   <FormItem>
                     <FormLabel>
                       {translate(
-                        "turboost_ui.view.rename_view_dialog.form.name_field.label"
+                        "turboost_ui.view.rename_view_dialog.form.name_field.label",
                       ) ?? "Name"}
                     </FormLabel>
                     <FormControl>
@@ -327,9 +327,9 @@ export function View({
                   {loading ? (
                     <Spinner />
                   ) : (
-                    translate(
-                      "turboost_ui.view.rename_view_dialog.form.submit_btn.content"
-                    ) ?? "Save"
+                    (translate(
+                      "turboost_ui.view.rename_view_dialog.form.submit_btn.content",
+                    ) ?? "Save")
                   )}
                 </Button>
               </DialogFooter>
@@ -367,9 +367,9 @@ export function View({
               {loading ? (
                 <Spinner />
               ) : (
-                translate(
-                  "turboost_ui.view.delete_view_dialog.delete_btn.content"
-                ) ?? "Delete"
+                (translate(
+                  "turboost_ui.view.delete_view_dialog.delete_btn.content",
+                ) ?? "Delete")
               )}
             </Button>
           </DialogFooter>

@@ -19,7 +19,7 @@ type TagsInputProps = Omit<
 const TagsInput = React.forwardRef<HTMLInputElement, TagsInputProps>(
   (
     { className, value, onChange, badgeVariant = "secondary", ...props },
-    ref
+    ref,
   ) => {
     const [pendingDataPoint, setPendingDataPoint] = React.useState("");
 
@@ -48,7 +48,7 @@ const TagsInput = React.forwardRef<HTMLInputElement, TagsInputProps>(
           "border-input dark:bg-input/30 flex min-h-10 w-full flex-wrap gap-2 rounded-md border bg-transparent px-3 py-2 text-sm transition-[color,box-shadow]",
           "focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]",
           props.disabled && "cursor-not-allowed opacity-50",
-          className
+          className,
         )}
       >
         {value.map((item, index) => (
@@ -69,7 +69,7 @@ const TagsInput = React.forwardRef<HTMLInputElement, TagsInputProps>(
         ))}
         <input
           className={cn(
-            "placeholder:text-muted-foreground flex-1 outline-none disabled:cursor-not-allowed"
+            "placeholder:text-muted-foreground flex-1 outline-none disabled:cursor-not-allowed",
           )}
           disabled={props.disabled}
           value={pendingDataPoint}
@@ -95,7 +95,7 @@ const TagsInput = React.forwardRef<HTMLInputElement, TagsInputProps>(
         />
       </div>
     );
-  }
+  },
 );
 
 TagsInput.displayName = "TagsInput";

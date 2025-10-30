@@ -41,14 +41,14 @@ export const ViewPreview = () => {
         console.log("handleEditView", key, type, payload);
         setViews((prev) =>
           prev.map((view) =>
-            view.key === key ? { ...view, label: payload.label } : view
-          )
+            view.key === key ? { ...view, label: payload.label } : view,
+          ),
         );
       } else if (type === ViewItemEditType.DELETE) {
         setViews((prev) => prev.filter((view) => view.key !== key));
       }
     },
-    []
+    [],
   );
 
   return (

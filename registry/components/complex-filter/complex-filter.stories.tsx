@@ -62,9 +62,9 @@ const ComplexFilterWithState = () => {
         value={value}
         onChange={setValue}
       />
-      <div className="mt-4 p-4 bg-muted rounded-lg">
-        <h3 className="font-semibold mb-2">当前 Value:</h3>
-        <pre className="text-sm overflow-auto">
+      <div className="bg-muted mt-4 rounded-lg p-4">
+        <h3 className="mb-2 font-semibold">当前 Value:</h3>
+        <pre className="overflow-auto text-sm">
           {JSON.stringify(value, null, 2)}
         </pre>
       </div>
