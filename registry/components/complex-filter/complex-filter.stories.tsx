@@ -120,3 +120,45 @@ export const WithInitialValue: Story = {
     },
   },
 };
+
+const ComplexFilterWithStringFormat = () => {
+  const [value, setValue] = useState<string>("name:Joe AND age:<18");
+
+  return (
+    <div className="w-full max-w-4xl">
+      <ComplexFilter
+        filters={[
+          {
+            field: "name",
+            label: "姓名",
+            type: ComplexFilterType.STRING,
+          },
+          {
+            field: "age",
+            label: "年龄",
+            type: ComplexFilterType.NUMBER,
+          },
+          {
+            field: "status",
+            label: "状态",
+            type: ComplexFilterType.STRING,
+          },
+        ]}
+        value={value}
+        onChange={setValue}
+        valueFormat="string"
+      />
+      <div className="bg-muted mt-4 rounded-lg p-4">
+        <h3 className="mb-2 font-semibold">当前 Value (String 格式):</h3>
+        <pre className="overflow-auto text-sm">{value}</pre>
+      </div>
+    </div>
+  );
+};
+
+export const StringFormat: Story = {
+  args: {
+    filters: [],
+  },
+  render: () => <ComplexFilterWithStringFormat />,
+};

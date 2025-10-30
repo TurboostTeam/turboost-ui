@@ -61,6 +61,14 @@ export type ComplexFilterValue =
   | ComplexFilterGroupValue
   | ComplexFilterCondition;
 
+export type ComplexFilterValueFormat = "object" | "string";
+
+/**
+ * 根据 valueFormat 映射到对应的值类型
+ */
+export type ComplexFilterValueByFormat<T extends ComplexFilterValueFormat> =
+  T extends "string" ? string : ComplexFilterValue;
+
 const filterOperators: Record<ComplexFilterType, ComplexFilterOperator[]> = {
   [ComplexFilterType.STRING]: ["$eq", "$ne", "$like", "$nlike"],
   [ComplexFilterType.NUMBER]: ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte"],
@@ -164,6 +172,265 @@ function cleanFilterValue(
 
     return value;
   }
+}
+
+/**
+ * 将运算符转换为 Shopify 搜索语法格式
+ */
+function operatorToString(operator: ComplexFilterOperator): string {
+  const operatorMap: Record<ComplexFilterOperator, string> = {
+    $eq: ":",
+    $ne: ":-",
+    $gt: ":>",
+    $gte: ":>=",
+    $lt: ":<",
+    $lte: ":<=",
+    $like: ":",
+    $nlike: ":-",
+    $in: ":",
+    $nin: ":-",
+  };
+  return operatorMap[operator] || ":";
+}
+
+/**
+ * 将 ComplexFilterValue 对象转换为 Shopify 搜索语法格式的字符串
+ * 例如: { name: { $eq: "Joe" } } 转换为 "name:Joe"
+ * 例如: { age: { $gt: 18 } } 转换为 "age:>18"
+ * 参考: https://shopify.dev/docs/api/usage/search-syntax
+ */
+export function filterValueToString(
+  value: ComplexFilterValue,
+  isNested = false,
+): string {
+  if (isFilterGroup(value)) {
+    const logical =
+      ComplexFilterLogical.AND in value
+        ? ComplexFilterLogical.AND
+        : ComplexFilterLogical.OR;
+    const items = value[logical];
+
+    if (!items || items.length === 0) return "";
+
+    const logicalStr = logical === ComplexFilterLogical.AND ? "AND" : "OR";
+
+    const itemStrings = items
+      .map((item) => {
+        // 递归调用时标记为嵌套
+        if (isFilterGroup(item)) {
+          return filterValueToString(item, true);
+        }
+        return filterValueToString(item, false);
+      })
+      .filter((s) => s !== "");
+
+    if (itemStrings.length === 0) return "";
+
+    // 对于嵌套的子组,需要加括号
+    const joined = itemStrings.join(` ${logicalStr} `);
+
+    // 只有当这是嵌套组时才加括号
+    if (isNested) {
+      return `(${joined})`;
+    }
+
+    return joined;
+  } else {
+    // 处理条件
+    const entries = Object.entries(value);
+    if (entries.length === 0) return "";
+
+    const [field, operatorValuePair] = entries[0];
+    if (!operatorValuePair) return "";
+
+    const operatorEntries = Object.entries(operatorValuePair);
+    if (operatorEntries.length === 0) return "";
+
+    const [operator, targetValue] = operatorEntries[0];
+
+    const operatorStr = operatorToString(operator as ComplexFilterOperator);
+
+    // 格式化值 - Shopify 格式: field:value (字段和值之间没有空格)
+    let valueStr = String(targetValue);
+    if (typeof targetValue === "string" && targetValue.includes(" ")) {
+      valueStr = `"${targetValue}"`;
+    }
+
+    return `${field}${operatorStr}${valueStr}`;
+  }
+}
+
+/**
+ * 从 Shopify 格式的字符串解析运算符
+ */
+function parseOperatorFromString(
+  opStr: string,
+): ComplexFilterOperator | undefined {
+  const operatorMap: Record<string, ComplexFilterOperator> = {
+    ":": "$eq",
+    ":-": "$ne",
+    ":>": "$gt",
+    ":>=": "$gte",
+    ":<": "$lt",
+    ":<=": "$lte",
+  };
+  return operatorMap[opStr.trim()];
+}
+
+/**
+ * 将 Shopify 搜索语法格式的字符串转换回 ComplexFilterValue 对象
+ * 例如: "name:Joe AND age:>18" 转换为 { $and: [{ name: { $eq: "Joe" } }, { age: { $gt: 18 } }] }
+ * 参考: https://shopify.dev/docs/api/usage/search-syntax
+ */
+export function stringToFilterValue(str: string): ComplexFilterValue {
+  const trimmed = str.trim();
+
+  if (!trimmed) {
+    return { [ComplexFilterLogical.AND]: [] };
+  }
+
+  // 运算符映射（按照长度从长到短排序，避免 :>= 被匹配为 :>）
+  const operatorPatterns: Array<{
+    pattern: string;
+    operator: ComplexFilterOperator;
+  }> = [
+    { pattern: ":>=", operator: "$gte" },
+    { pattern: ":<=", operator: "$lte" },
+    { pattern: ":-", operator: "$ne" },
+    { pattern: ":>", operator: "$gt" },
+    { pattern: ":<", operator: "$lt" },
+    { pattern: ":", operator: "$eq" },
+  ];
+
+  /**
+   * 按逻辑运算符拆分字符串，但要考虑括号嵌套
+   */
+  const splitByLogical = (expr: string, logicalOp: string): string[] | null => {
+    const parts: string[] = [];
+    let current = "";
+    let depth = 0;
+    let i = 0;
+
+    while (i < expr.length) {
+      const char = expr[i];
+
+      if (char === "(") {
+        depth++;
+        current += char;
+        i++;
+      } else if (char === ")") {
+        depth--;
+        current += char;
+        i++;
+      } else if (depth === 0) {
+        // 只在括号外层检查逻辑运算符
+        const remaining = expr.substring(i);
+        const regex = new RegExp(`^\\s+(${logicalOp})\\s+`, "i");
+        const match = remaining.match(regex);
+
+        if (match) {
+          parts.push(current.trim());
+          current = "";
+          i += match[0].length;
+        } else {
+          current += char;
+          i++;
+        }
+      } else {
+        current += char;
+        i++;
+      }
+    }
+
+    if (current.trim()) {
+      parts.push(current.trim());
+    }
+
+    return parts.length > 1 ? parts : null;
+  };
+
+  // 解析表达式
+  const parseExpression = (expr: string): ComplexFilterValue => {
+    expr = expr.trim();
+    let hadParens = false;
+
+    // 检查是否被括号包围且是完整配对
+    if (expr.startsWith("(") && expr.endsWith(")")) {
+      let depth = 0;
+      let isWrapped = true;
+
+      for (let i = 0; i < expr.length; i++) {
+        if (expr[i] === "(") depth++;
+        if (expr[i] === ")") depth--;
+
+        // 如果在中间位置深度降为 0，说明不是完整包围
+        if (depth === 0 && i < expr.length - 1) {
+          isWrapped = false;
+          break;
+        }
+      }
+
+      if (isWrapped) {
+        hadParens = true;
+        expr = expr.slice(1, -1).trim();
+      }
+    }
+
+    // 先尝试 OR (优先级更高)
+    let parts = splitByLogical(expr, "OR");
+    if (parts) {
+      const items = parts.map((part) => parseExpression(part));
+      return { [ComplexFilterLogical.OR]: items };
+    }
+
+    // 再尝试 AND
+    parts = splitByLogical(expr, "AND");
+    if (parts) {
+      const items = parts.map((part) => parseExpression(part));
+      return { [ComplexFilterLogical.AND]: items };
+    }
+
+    // 尝试解析为条件 - Shopify 格式: field:value (没有空格)
+    for (const { pattern, operator } of operatorPatterns) {
+      // 需要转义特殊字符
+      const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(`^(.+?)${escapedPattern}(.+)$`);
+      const match = expr.match(regex);
+
+      if (match) {
+        const field = match[1].trim();
+        let value: any = match[2].trim();
+
+        // 移除值周围的引号
+        if (
+          (value.startsWith('"') && value.endsWith('"')) ||
+          (value.startsWith("'") && value.endsWith("'"))
+        ) {
+          value = value.slice(1, -1);
+        }
+
+        // 尝试转换为数字
+        const numValue = Number(value);
+        if (!isNaN(numValue) && value !== "") {
+          value = numValue;
+        }
+
+        const condition = { [field]: { [operator]: value } };
+
+        // 如果原本有括号，包装成子组
+        if (hadParens) {
+          return { [ComplexFilterLogical.AND]: [condition] };
+        }
+
+        return condition;
+      }
+    }
+
+    // 无法解析，返回空
+    return { [ComplexFilterLogical.AND]: [] };
+  };
+
+  return parseExpression(trimmed);
 }
 
 export interface ComplexFilterConditionRowProps {
@@ -433,19 +700,25 @@ export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
   );
 };
 
-export interface ComplexFilterProps {
+export interface ComplexFilterProps<
+  TFormat extends ComplexFilterValueFormat = "object",
+> {
   filters: ComplexFilterItem[];
   i18n?: ComplexFilterI18n;
-  value?: ComplexFilterValue;
-  onChange?: (value: ComplexFilterValue) => void;
+  valueFormat?: TFormat;
+  value?: ComplexFilterValueByFormat<TFormat>;
+  onChange?: (value: ComplexFilterValueByFormat<TFormat>) => void;
 }
 
-export const ComplexFilter: FC<ComplexFilterProps> = ({
+export const ComplexFilter = <
+  TFormat extends ComplexFilterValueFormat = "object",
+>({
   i18n = defaultComplexFilterI18n,
   filters,
   value,
   onChange,
-}) => {
+  valueFormat = "object" as TFormat,
+}: ComplexFilterProps<TFormat>) => {
   // 内部维护完整的 value（包括空条件），用于 UI 显示和编辑
   const [internalDisplayValue, setInternalDisplayValue] =
     useState<ComplexFilterValue>({
@@ -460,15 +733,26 @@ export const ComplexFilter: FC<ComplexFilterProps> = ({
   useEffect(() => {
     if (value !== undefined) {
       const currentCleanedStr = lastCleanedValueStrRef.current;
-      const externalValueStr = JSON.stringify(value);
+
+      // 根据 valueFormat 处理输入值
+      let objectValue: ComplexFilterValue;
+      if (valueFormat === "string" && typeof value === "string") {
+        objectValue = stringToFilterValue(value);
+      } else if (typeof value === "object") {
+        objectValue = value;
+      } else {
+        objectValue = { [ComplexFilterLogical.AND]: [] };
+      }
+
+      const externalValueStr = JSON.stringify(objectValue);
 
       // 只有当外部值与上次输出的清理值不同时才同步
       // 这避免了因为我们输出清理值导致的无意义同步
       if (externalValueStr !== currentCleanedStr) {
-        setInternalDisplayValue(value);
+        setInternalDisplayValue(objectValue);
       }
     }
-  }, [value]);
+  }, [value, valueFormat, i18n]);
 
   const handleChange = (newValue: ComplexFilterValue) => {
     // 内部保存完整的 value（包括空条件）
@@ -477,13 +761,20 @@ export const ComplexFilter: FC<ComplexFilterProps> = ({
     // 对外输出时清理空条件
     if (onChange) {
       const cleaned = cleanFilterValue(newValue);
-      const finalValue = cleaned ?? { [ComplexFilterLogical.AND]: [] };
-      const finalValueStr = JSON.stringify(finalValue);
+      const finalObjectValue = cleaned ?? { [ComplexFilterLogical.AND]: [] };
+      const finalValueStr = JSON.stringify(finalObjectValue);
 
       // 只在清理后的值真正改变时才调用 onChange
       if (finalValueStr !== lastCleanedValueStrRef.current) {
         lastCleanedValueStrRef.current = finalValueStr;
-        onChange(finalValue);
+
+        // 根据 valueFormat 输出不同格式
+        if (valueFormat === "string") {
+          const stringValue = filterValueToString(finalObjectValue);
+          onChange(stringValue as ComplexFilterValueByFormat<TFormat>);
+        } else {
+          onChange(finalObjectValue as ComplexFilterValueByFormat<TFormat>);
+        }
       }
     }
   };
@@ -494,7 +785,13 @@ export const ComplexFilter: FC<ComplexFilterProps> = ({
     if (onChange) {
       const emptyValueStr = JSON.stringify(emptyValue);
       lastCleanedValueStrRef.current = emptyValueStr;
-      onChange(emptyValue);
+
+      // 根据 valueFormat 输出不同格式
+      if (valueFormat === "string") {
+        onChange("" as ComplexFilterValueByFormat<TFormat>);
+      } else {
+        onChange(emptyValue as unknown as ComplexFilterValueByFormat<TFormat>);
+      }
     }
   };
 
