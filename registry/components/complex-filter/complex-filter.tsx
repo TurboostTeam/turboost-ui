@@ -627,7 +627,7 @@ export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
           <div className="mb-4 flex gap-2">
             {/* 左侧大括号连接线 + 逻辑运算符按钮 */}
             {items.length > 1 && (
-              <div className="flex w-10 flex-col py-4 pl-4">
+              <div className="flex w-12 flex-col py-4 pl-4">
                 {/* 上半部分 - 顶部圆角 + 垂直线 */}
                 <div className="border-border w-full flex-1 rounded-tl-md border-t-2 border-l-2" />
 
