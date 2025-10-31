@@ -49,6 +49,11 @@ const ComplexFilterWithState = () => {
             type: ComplexFilterType.NUMBER,
           },
           {
+            field: "birthday",
+            label: "出生日期",
+            type: ComplexFilterType.DATE,
+          },
+          {
             field: "createdAt",
             label: "创建时间",
             type: ComplexFilterType.DATETIME,

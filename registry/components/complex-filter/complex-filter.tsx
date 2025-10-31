@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { NumberInput } from "@/registry/components/number-input/number-input";
+import { DateInput } from "@/registry/components/date-input/date-input";
 
 export enum ComplexFilterType {
   STRING = "string",
@@ -527,15 +528,26 @@ export const ComplexFilterConditionRow: FC<ComplexFilterConditionRowProps> = ({
 
       {selectedFilter?.type === ComplexFilterType.NUMBER ? (
         <NumberInput
-          className="min-w-[200px]"
+          className="min-w-[200px] flex-1"
           placeholder={i18n.selectValue}
           value={targetValue ?? ""}
           onValueChange={(values) => handleValueChange(values.floatValue)}
           disabled={!operator}
         />
+      ) : selectedFilter?.type === ComplexFilterType.DATE ||
+        selectedFilter?.type === ComplexFilterType.DATETIME ? (
+        <DateInput
+          className="min-w-[200px] flex-1"
+          placeholder={i18n.selectValue}
+          value={targetValue ? new Date(targetValue) : undefined}
+          onChange={(date) =>
+            handleValueChange(date ? date.toISOString() : undefined)
+          }
+          disabled={!operator}
+        />
       ) : (
         <Input
-          className="min-w-[200px]"
+          className="min-w-[200px] flex-1"
           placeholder={i18n.selectValue}
           value={targetValue ?? ""}
           onChange={(e) => handleValueChange(e.target.value)}

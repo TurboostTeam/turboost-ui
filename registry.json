@@ -165,7 +165,8 @@
         "input",
         "select",
         "dropdown-menu",
-        "number-input"
+        "number-input",
+        "date-input"
       ],
       "files": [
         {
@@ -187,6 +188,36 @@
           "path": "registry/components/number-input/number-input.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/number-input/number-input.tsx"
+        }
+      ]
+    },
+    {
+      "name": "calendar",
+      "type": "registry:block",
+      "title": "Calendar",
+      "description": "A calendar component with presets support",
+      "dependencies": ["react-day-picker", "dayjs"],
+      "registryDependencies": ["button", "calendar"],
+      "files": [
+        {
+          "path": "registry/components/calendar/calendar.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/calendar/calendar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "date-input",
+      "type": "registry:component",
+      "title": "Date Input",
+      "description": "A date input component with calendar picker",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["button", "popover", "calendar"],
+      "files": [
+        {
+          "path": "registry/components/date-input/date-input.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/date-input/date-input.tsx"
         }
       ]
     }
