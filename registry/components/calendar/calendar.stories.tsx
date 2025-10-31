@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import { Calendar, CalendarPreset } from "./calendar";
 
 const meta = {
-  title: "Blocks/Calendar",
+  title: "Components/Calendar",
   component: Calendar,
   parameters: {
     layout: "padded",

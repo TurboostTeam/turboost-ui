@@ -8,7 +8,7 @@ import {
 } from "./complex-filter";
 
 const meta = {
-  title: "Blocks/ComplexFilter",
+  title: "Components/Complex Filter",
   component: ComplexFilter,
   parameters: {
     layout: "padded",

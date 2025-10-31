@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import { DateInput } from "./date-input";
 
 const meta = {
-  title: "Blocks/DateInput",
+  title: "Components/Date Input",
   component: DateInput,
   parameters: {
     layout: "padded",

@@ -36,8 +36,8 @@ const DateInput = forwardRef<HTMLButtonElement, DateInputProps>(
     {
       value,
       onChange,
-      placeholder = "选择日期",
-      formatDate = (date: Date) => date.toLocaleDateString("zh-CN"),
+      placeholder = "Select date",
+      formatDate = (date: Date) => date.toLocaleDateString("en-US"),
       disabled = false,
       className,
       variant = "outline",
