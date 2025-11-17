@@ -220,6 +220,34 @@
           "target": "components/turboost-ui/date-input/date-input.tsx"
         }
       ]
+    },
+    {
+      "name": "search-params",
+      "type": "registry:lib",
+      "title": "Search Params",
+      "description": "Utilities for parsing and stringifying search parameters",
+      "dependencies": ["zod"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/lib/search-params.ts",
+          "type": "registry:file"
+        }
+      ]
+    },
+    {
+      "name": "use-search-params",
+      "type": "registry:hook",
+      "title": "Use Search Params",
+      "description": "A React hook for parsing search parameters with Zod schema validation",
+      "dependencies": ["react", "zod"],
+      "registryDependencies": ["search-params"],
+      "files": [
+        {
+          "path": "registry/hooks/use-search-params.ts",
+          "type": "registry:file"
+        }
+      ]
     }
   ]
 }
