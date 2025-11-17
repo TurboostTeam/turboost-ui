@@ -231,7 +231,8 @@
       "files": [
         {
           "path": "registry/lib/search-params.ts",
-          "type": "registry:file"
+          "type": "registry:file",
+          "target": "lib/search-params.ts"
         }
       ]
     },
@@ -245,7 +246,8 @@
       "files": [
         {
           "path": "registry/hooks/use-search-params.ts",
-          "type": "registry:file"
+          "type": "registry:file",
+          "target": "hooks/use-search-params.ts"
         }
       ]
     }

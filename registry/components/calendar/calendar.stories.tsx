@@ -99,14 +99,23 @@ const CalendarWithMultipleSelect = () => {
 };
 
 export const Default: Story = {
+  args: {
+    mode: "single",
+  },
   render: () => <CalendarWithSingleSelect />,
 };
 
 export const RangeSelect: Story = {
+  args: {
+    mode: "range",
+  },
   render: () => <CalendarWithRangeSelect />,
 };
 
 export const MultipleSelect: Story = {
+  args: {
+    mode: "multiple",
+  },
   render: () => <CalendarWithMultipleSelect />,
 };
 
@@ -174,6 +183,9 @@ const CalendarWithPresets = () => {
 };
 
 export const WithPresets: Story = {
+  args: {
+    mode: "single",
+  },
   render: () => <CalendarWithPresets />,
 };
 
@@ -237,6 +249,9 @@ const CalendarRangeWithPresets = () => {
 };
 
 export const RangeWithPresets: Story = {
+  args: {
+    mode: "range",
+  },
   render: () => <CalendarRangeWithPresets />,
 };
 
@@ -245,7 +260,7 @@ const CalendarMultipleWithPresets = () => {
   const [dates, setDates] = useState<Date[] | undefined>([new Date()]);
 
   // 根据 mode="multiple"，preset value 类型自动推断为 Date[]
-  const multiplePresets: CalendarPreset<Date[]>[] = [
+  const multiplePresets: CalendarPreset<"multiple">[] = [
     {
       label: "今天",
       value: [dayjs().toDate()],
@@ -276,11 +291,6 @@ const CalendarMultipleWithPresets = () => {
         onSelect={setDates}
         className="rounded-md border"
         presets={multiplePresets}
-        onPresetSelect={(selectedDates) => {
-          // selectedDates 类型自动推断为 Date[]
-          console.log("选中的日期数量:", selectedDates.length);
-          setDates(selectedDates);
-        }}
       />
       <div className="bg-muted mt-4 rounded-lg p-4">
         <h3 className="mb-2 font-semibold">选中的日期列表:</h3>
@@ -295,5 +305,8 @@ const CalendarMultipleWithPresets = () => {
 };
 
 export const MultipleWithPresets: Story = {
+  args: {
+    mode: "multiple",
+  },
   render: () => <CalendarMultipleWithPresets />,
 };
