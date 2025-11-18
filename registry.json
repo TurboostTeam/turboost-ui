@@ -165,8 +165,8 @@
         "input",
         "select",
         "dropdown-menu",
-        "number-input",
-        "date-input"
+        "@turboost-ui/number-input",
+        "@turboost-ui/date-input"
       ],
       "files": [
         {
@@ -212,7 +212,7 @@
       "title": "Date Input",
       "description": "A date input component with calendar picker",
       "dependencies": ["lucide-react"],
-      "registryDependencies": ["button", "popover", "calendar"],
+      "registryDependencies": ["button", "popover", "@turboost-ui/calendar"],
       "files": [
         {
           "path": "registry/components/date-input/date-input.tsx",
@@ -242,7 +242,7 @@
       "title": "Use Search Params",
       "description": "A React hook for parsing search parameters with Zod schema validation",
       "dependencies": ["react", "zod"],
-      "registryDependencies": ["search-params"],
+      "registryDependencies": ["@turboost-ui/search-params"],
       "files": [
         {
           "path": "registry/hooks/use-search-params.ts",
