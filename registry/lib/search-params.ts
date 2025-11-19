@@ -66,7 +66,7 @@ export function parseSearchParams<
     }
   }
 
-  return (schema ?? defaultSearchParamsSchema).parse(query);
+  return (schema ?? defaultSearchParamsSchema).parse(query) as z.infer<T>;
 }
 
 export function stringifySearchParamsWith() {

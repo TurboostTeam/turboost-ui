@@ -177,6 +177,21 @@
       ]
     },
     {
+      "name": "data-table",
+      "type": "registry:component",
+      "title": "Data Table",
+      "description": "A data table component",
+      "dependencies": ["@tanstack/react-table", "lucide-react"],
+      "registryDependencies": ["button", "checkbox", "dropdown-menu", "table"],
+      "files": [
+        {
+          "path": "registry/components/data-table/index.tsx",
+          "type": "registry:component",
+          "target": "components/turboost-ui/data-table/index.tsx"
+        }
+      ]
+    },
+    {
       "name": "number-input",
       "type": "registry:component",
       "title": "Number Input",
