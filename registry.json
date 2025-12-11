@@ -182,7 +182,13 @@
       "title": "Data Table",
       "description": "A data table component",
       "dependencies": ["@tanstack/react-table", "lucide-react"],
-      "registryDependencies": ["button", "checkbox", "dropdown-menu", "table"],
+      "registryDependencies": [
+        "button",
+        "button-group",
+        "checkbox",
+        "dropdown-menu",
+        "table"
+      ],
       "files": [
         {
           "path": "registry/components/data-table/index.tsx",
@@ -263,6 +269,21 @@
           "path": "registry/hooks/use-search-params.ts",
           "type": "registry:file",
           "target": "hooks/use-search-params.ts"
+        }
+      ]
+    },
+    {
+      "name": "connection-search",
+      "type": "registry:lib",
+      "title": "Connection Search",
+      "description": "Utilities for creating GraphQL Connection-style pagination search schemas with Zod",
+      "dependencies": ["zod"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/lib/connection-search.ts",
+          "type": "registry:file",
+          "target": "lib/connection-search.ts"
         }
       ]
     }

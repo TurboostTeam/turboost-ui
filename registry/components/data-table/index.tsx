@@ -1,16 +1,22 @@
 "use client";
 
 import {
-  Column,
-  ColumnDef,
   flexRender,
   getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import type {
+  Column,
+  ColumnDef,
   RowData,
   RowSelectionState,
   TableOptions,
-  useReactTable,
 } from "@tanstack/react-table";
 
+import type { CSSProperties, ReactNode } from "react";
 import {
   Table,
   TableBody,
@@ -19,10 +25,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CSSProperties, ReactNode, useEffect, useMemo, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ChevronDownIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,6 +51,13 @@ function getCommonPinningClassNames<TData>(column: Column<TData>): string {
   return cn(isPinned ? "sticky z-1" : "relative z-0");
 }
 
+export interface DataTablePaginationProps {
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+  onPreviousPage?: () => void;
+  onNextPage?: () => void;
+}
+
 export type DataTableColumnProps<
   TData extends RowData,
   TValue = unknown,
@@ -55,10 +66,12 @@ export type DataTableColumnProps<
 };
 
 export interface DataTableProps<TData extends RowData, TValue = unknown> {
-  columns: DataTableColumnProps<TData, TValue>[];
-  data: TData[];
+  columns: Array<DataTableColumnProps<TData, TValue>>;
+  data: Array<TData>;
 
-  onRowSelectionChange?: (rows: TData[]) => void;
+  pagination?: DataTablePaginationProps;
+
+  onRowSelectionChange?: (rows: Array<TData>) => void;
   onAllRowsSelectedChange?: (selected: boolean) => void;
 
   bulkActions?: ReactNode;
@@ -69,6 +82,7 @@ export interface DataTableProps<TData extends RowData, TValue = unknown> {
 export function DataTable<TData extends RowData, TValue = unknown>({
   columns,
   data,
+  pagination,
   bulkActions,
   onRowSelectionChange,
   onAllRowsSelectedChange,
@@ -115,7 +129,7 @@ export function DataTable<TData extends RowData, TValue = unknown>({
     ];
   }, [columns]);
 
-  const tableColumns: ColumnDef<TData, TValue>[] = useMemo(() => {
+  const tableColumns: Array<ColumnDef<TData, TValue>> = useMemo(() => {
     return columnsWithSelection.map((column) => ({
       accessorKey: column.id,
       ...column,
@@ -159,126 +173,154 @@ export function DataTable<TData extends RowData, TValue = unknown>({
   }, [isAllPageRowsSelected, onAllRowsSelectedChange]);
 
   return (
-    <div className="relative overflow-auto rounded-md border">
-      {/* batch actions */}
-      {Object.keys(rowSelection).length > 0 && (
-        <div className="bg-background absolute top-0 left-0 z-100 flex h-10 w-full items-center gap-2 px-2">
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) =>
-              table.toggleAllPageRowsSelected(!!value)
-            }
-          />
+    <div>
+      <div className="relative overflow-auto rounded-md border">
+        {/* batch actions */}
+        {Object.keys(rowSelection).length > 0 && (
+          <div className="bg-background absolute top-0 left-0 z-100 flex h-10 w-full items-center gap-2 px-2">
+            <Checkbox
+              checked={
+                table.getIsAllPageRowsSelected() ||
+                (table.getIsSomePageRowsSelected() && "indeterminate")
+              }
+              onCheckedChange={(value) =>
+                table.toggleAllPageRowsSelected(!!value)
+              }
+            />
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
-                {isAllPageRowsSelected
-                  ? "All selected"
-                  : `${Object.keys(rowSelection).length} selected`}
-                <ChevronDownIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuGroup>
-                {!table.getIsAllPageRowsSelected() && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  {isAllPageRowsSelected
+                    ? "All selected"
+                    : `${Object.keys(rowSelection).length} selected`}
+                  <ChevronDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuGroup>
+                  {!table.getIsAllPageRowsSelected() && (
+                    <DropdownMenuItem
+                      onClick={() => table.toggleAllPageRowsSelected(true)}
+                    >
+                      Select all {table.getRowCount()} on page
+                    </DropdownMenuItem>
+                  )}
+
+                  {!isAllPageRowsSelected && (
+                    <DropdownMenuItem
+                      onClick={() => {
+                        table.toggleAllPageRowsSelected(true);
+                        setIsAllPageRowsSelected(true);
+                      }}
+                    >
+                      Select all
+                    </DropdownMenuItem>
+                  )}
+
                   <DropdownMenuItem
-                    onClick={() => table.toggleAllPageRowsSelected(true)}
+                    onClick={() => table.toggleAllPageRowsSelected(false)}
                   >
-                    Select all {table.getRowCount()} on page
+                    Unselect all
                   </DropdownMenuItem>
-                )}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-                {!isAllPageRowsSelected && (
-                  <DropdownMenuItem
-                    onClick={() => {
-                      table.toggleAllPageRowsSelected(true);
-                      setIsAllPageRowsSelected(true);
-                    }}
-                  >
-                    Select all
-                  </DropdownMenuItem>
-                )}
+            {bulkActions}
+          </div>
+        )}
 
-                <DropdownMenuItem
-                  onClick={() => table.toggleAllPageRowsSelected(false)}
+        <Table className="bg-background table-fixed">
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={cn(
+                        "bg-background whitespace-normal",
+                        getCommonPinningClassNames<TData>(header.column),
+                      )}
+                      style={{
+                        ...getCommonPinningStyles<TData>(header.column),
+                      }}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
                 >
-                  Unselect all
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        "bg-background whitespace-normal",
+                        getCommonPinningClassNames<TData>(cell.column),
+                      )}
+                      style={{
+                        ...getCommonPinningStyles<TData>(cell.column),
+                      }}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="bg-background h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
-          {bulkActions}
+      {pagination && (
+        <div className="flex items-center justify-center py-4">
+          <ButtonGroup>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={pagination.onPreviousPage}
+              disabled={!pagination.hasPreviousPage}
+            >
+              <ChevronLeft />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={pagination.onNextPage}
+              disabled={!pagination.hasNextPage}
+            >
+              <ChevronRight />
+            </Button>
+          </ButtonGroup>
         </div>
       )}
-
-      <Table className="bg-background table-fixed">
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead
-                    key={header.id}
-                    className={cn(
-                      "bg-background whitespace-normal",
-                      getCommonPinningClassNames<TData>(header.column),
-                    )}
-                    style={{
-                      ...getCommonPinningStyles<TData>(header.column),
-                    }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    className={cn(
-                      "bg-background whitespace-normal",
-                      getCommonPinningClassNames<TData>(cell.column),
-                    )}
-                    style={{
-                      ...getCommonPinningStyles<TData>(cell.column),
-                    }}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="bg-background h-24 text-center"
-              >
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
     </div>
   );
 }
