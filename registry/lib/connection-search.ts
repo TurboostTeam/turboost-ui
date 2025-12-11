@@ -73,19 +73,19 @@ export type ConnectionSearch<OrderField extends EnumLike> = z.infer<
   ReturnType<typeof createConnectionSearchSchema<OrderField>>
 >;
 
-export function getPreviousSearch<
+export function getPreviousPageSearch<
   Search extends ConnectionSearch<EnumLike> = ConnectionSearch<EnumLike>,
 >(search: Search, pageInfo?: PageInfo) {
   return {
     ...search,
     first: undefined,
-    last: "first" in search ? search.first : search.last,
+    last: "last" in search ? search.last : search.first,
     before: pageInfo?.startCursor ?? undefined,
     after: undefined,
   };
 }
 
-export function getNextSearch<
+export function getNextPageSearch<
   Search extends ConnectionSearch<EnumLike> = ConnectionSearch<EnumLike>,
 >(search: Search, pageInfo?: PageInfo) {
   return {
