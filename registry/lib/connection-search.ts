@@ -27,8 +27,20 @@ export function createConnectionSearchSchema<OrderField extends EnumLike>(
 ) {
   return z
     .object({
-      first: z.number().int().positive().optional(),
-      last: z.number().int().positive().optional(),
+      first: z
+        .number()
+        .int()
+        .min(1)
+        .max(options.pageSize)
+        .optional()
+        .catch(() => options.pageSize),
+      last: z
+        .number()
+        .int()
+        .min(1)
+        .max(options.pageSize)
+        .optional()
+        .catch(() => options.pageSize),
       after: z.string().optional(),
       before: z.string().optional(),
       query: z.string().optional(),
