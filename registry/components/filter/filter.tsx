@@ -163,9 +163,7 @@ export function Filter({
     },
   });
 
-  const {
-    values: { filter: watchFilter },
-  } = useStore(form.store);
+  const watchFilter = useStore(form.store, (state) => state.values.filter);
 
   // 将筛选条件分组为固定和非固定两类
   const [{ fixedFilters, unfixedFilters }, setFilterGroups] = useState({
