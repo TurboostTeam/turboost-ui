@@ -70,6 +70,17 @@ const FilterWithState = () => {
         values={values}
         onChange={setValues}
       />
+
+      <pre className="overflow-auto text-sm">
+        {JSON.stringify(
+          {
+            values,
+            query,
+          },
+          null,
+          2,
+        )}
+      </pre>
     </div>
   );
 };
