@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tags-input",
+  "type": "registry:component",
+  "title": "Tags Input",
+  "description": "A tags input component",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "button",
+    "badge"
+  ],
+  "files": [
+    {
+      "path": "registry/components/tags-input/tags-input.tsx",
+      "content": "\"use client\";\n\nimport { XIcon } from \"lucide-react\";\nimport * as React from \"react\";\n\nimport { Badge } from \"@/components/ui/badge\";\nimport { Button } from \"@/components/ui/button\";\nimport { cn } from \"@/lib/utils\";\n\ntype TagsInputProps = Omit<\n  React.ComponentProps<\"input\">,\n  \"value\" | \"onChange\"\n> & {\n  value: string[];\n  onChange: React.Dispatch<React.SetStateAction<string[]>>;\n  badgeVariant?: React.ComponentProps<typeof Badge>[\"variant\"];\n};\n\nconst TagsInput = React.forwardRef<HTMLInputElement, TagsInputProps>(\n  (\n    { className, value, onChange, badgeVariant = \"secondary\", ...props },\n    ref,\n  ) => {\n    const [pendingDataPoint, setPendingDataPoint] = React.useState(\"\");\n\n    React.useEffect(() => {\n      if (/[;,]/.test(pendingDataPoint)) {\n        const newDataPoints = new Set([\n          ...value,\n          ...pendingDataPoint.split(/[;,]/).map((chunk) => chunk.trim()),\n        ]);\n        onChange(Array.from(newDataPoints));\n        setPendingDataPoint(\"\");\n      }\n    }, [pendingDataPoint, onChange, value]);\n\n    const addPendingDataPoint = () => {\n      if (pendingDataPoint) {\n        const newDataPoints = new Set([...value, pendingDataPoint]);\n        onChange(Array.from(newDataPoints));\n        setPendingDataPoint(\"\");\n      }\n    };\n\n    return (\n      <div\n        className={cn(\n          \"border-input dark:bg-input/30 flex min-h-10 w-full flex-wrap gap-2 rounded-md border bg-transparent px-3 py-2 text-sm transition-[color,box-shadow]\",\n          \"focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]\",\n          props.disabled && \"cursor-not-allowed opacity-50\",\n          className,\n        )}\n      >\n        {value.map((item, index) => (\n          <Badge key={`${item}-${index}`} variant={badgeVariant}>\n            <span className=\"block max-w-xs truncate break-words\">{item}</span>\n            <Button\n              variant=\"ghost\"\n              disabled={props.disabled}\n              size=\"icon\"\n              className=\"ml-2 size-4 p-0\"\n              onClick={() => {\n                onChange(value.filter((i) => i !== item));\n              }}\n            >\n              <XIcon />\n            </Button>\n          </Badge>\n        ))}\n        <input\n          className={cn(\n            \"placeholder:text-muted-foreground flex-1 outline-none disabled:cursor-not-allowed\",\n          )}\n          disabled={props.disabled}\n          value={pendingDataPoint}\n          onChange={(e) => setPendingDataPoint(e.target.value)}\n          onKeyDown={(e) => {\n            if (\n              [\"Enter\", \",\", \";\"].includes(e.key) ||\n              (e.key === \"Tab\" && pendingDataPoint)\n            ) {\n              e.preventDefault();\n              addPendingDataPoint();\n            } else if (\n              e.key === \"Backspace\" &&\n              pendingDataPoint.length === 0 &&\n              value.length > 0\n            ) {\n              e.preventDefault();\n              onChange(value.slice(0, -1));\n            }\n          }}\n          {...props}\n          ref={ref}\n        />\n      </div>\n    );\n  },\n);\n\nTagsInput.displayName = \"TagsInput\";\n\nexport { TagsInput };\n",
+      "type": "registry:component",
+      "target": "components/turboost-ui/tags-input/tags-input.tsx"
+    }
+  ]
+}

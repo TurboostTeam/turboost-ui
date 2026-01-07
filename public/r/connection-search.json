@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "connection-search",
+  "type": "registry:lib",
+  "title": "Connection Search",
+  "description": "Utilities for creating GraphQL Connection-style pagination search schemas with Zod",
+  "dependencies": [
+    "zod"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/lib/connection-search.ts",
+      "content": "import { z } from \"zod\";\nimport type { EnumLike } from \"zod\";\n\nexport enum OrderDirection {\n  ASC = \"ASC\",\n  DESC = \"DESC\",\n}\n\nexport interface PageInfo {\n  endCursor?: string | null;\n  hasNextPage: boolean;\n  hasPreviousPage: boolean;\n  startCursor?: string | null;\n}\n\nexport interface CreateConnectionSearchSchemaOptions<\n  OrderField extends EnumLike,\n> {\n  filterSchema?: z.ZodSchema;\n  pageSize: number;\n  orderField: OrderField;\n  defaultOrderField: OrderField[keyof OrderField];\n  defaultOrderDirection: OrderDirection;\n}\n\nexport function createConnectionSearchSchema<OrderField extends EnumLike>(\n  options: CreateConnectionSearchSchemaOptions<OrderField>,\n) {\n  return z\n    .object({\n      first: z\n        .number()\n        .int()\n        .min(1)\n        .max(options.pageSize)\n        .optional()\n        .catch(() => options.pageSize),\n      last: z\n        .number()\n        .int()\n        .min(1)\n        .max(options.pageSize)\n        .optional()\n        .catch(() => options.pageSize),\n      after: z.string().optional(),\n      before: z.string().optional(),\n      query: z.string().optional(),\n      orderBy: z\n        .object({\n          field: z\n            .nativeEnum(options.orderField)\n            .default(options.defaultOrderField),\n          direction: z\n            .nativeEnum(OrderDirection)\n            .default(options.defaultOrderDirection),\n        })\n        .optional(),\n      ...(options.filterSchema ? { filter: options.filterSchema } : {}),\n    })\n    .transform((data) => {\n      const { first, last, after, before, ...rest } = data;\n\n      if (first !== undefined || after !== undefined) {\n        return {\n          ...rest,\n          first: first ?? options.pageSize,\n          after,\n        };\n      }\n\n      if (last !== undefined || before !== undefined) {\n        return {\n          ...rest,\n          last: last ?? options.pageSize,\n          before,\n        };\n      }\n\n      return {\n        ...rest,\n        first: options.pageSize,\n      };\n    });\n}\n\nexport type ConnectionSearch<OrderField extends EnumLike> = z.infer<\n  ReturnType<typeof createConnectionSearchSchema<OrderField>>\n>;\n\nexport function getPreviousPageSearch<\n  Search extends ConnectionSearch<EnumLike> = ConnectionSearch<EnumLike>,\n>(search: Search, pageInfo?: PageInfo) {\n  return {\n    ...search,\n    first: undefined,\n    last: \"last\" in search ? search.last : search.first,\n    before: pageInfo?.startCursor ?? undefined,\n    after: undefined,\n  };\n}\n\nexport function getNextPageSearch<\n  Search extends ConnectionSearch<EnumLike> = ConnectionSearch<EnumLike>,\n>(search: Search, pageInfo?: PageInfo) {\n  return {\n    ...search,\n    first: \"first\" in search ? search.first : search.last,\n    last: undefined,\n    before: undefined,\n    after: pageInfo?.endCursor ?? undefined,\n  };\n}\n",
+      "type": "registry:file",
+      "target": "lib/connection-search.ts"
+    }
+  ]
+}

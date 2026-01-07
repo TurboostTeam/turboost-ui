@@ -66,91 +66,29 @@
       "type": "registry:block",
       "title": "Filter",
       "description": "A filter component",
-      "dependencies": ["lucide-react", "dayjs", "lodash", "react-hook-form"],
+      "dependencies": [
+        "lucide-react",
+        "dayjs",
+        "lodash",
+        "@tanstack/react-form"
+      ],
       "registryDependencies": [
         "badge",
         "dropdown-menu",
         "popover",
         "input-group",
-        "spinner",
-        "select"
+        "spinner"
       ],
       "files": [
         {
-          "path": "registry/types/field.ts",
+          "path": "registry/components/filter/utils/format-filter-values.ts",
           "type": "registry:file",
-          "target": "components/turboost-ui/types/field.ts"
-        },
-        {
-          "path": "registry/components/filter/utils/transform-object-by-fields.ts",
-          "type": "registry:file",
-          "target": "components/turboost-ui/filter/utils/transform-object-by-fields.ts"
+          "target": "components/turboost-ui/filter/utils/format-filter-values.ts"
         },
         {
           "path": "registry/components/filter/filter.tsx",
           "type": "registry:component",
           "target": "components/turboost-ui/filter/filter.tsx"
-        }
-      ]
-    },
-    {
-      "name": "index-table",
-      "type": "registry:block",
-      "title": "Index Table",
-      "description": "A index table component",
-      "dependencies": ["lodash", "lucide-react", "nuqs", "react-hook-form"],
-      "registryDependencies": [
-        "button",
-        "label",
-        "popover",
-        "radio-group",
-        "tooltip",
-        "dialog",
-        "form",
-        "input",
-        "spinner",
-        "empty"
-      ],
-      "files": [
-        {
-          "path": "registry/types/field.ts",
-          "type": "registry:file",
-          "target": "components/turboost-ui/types/field.ts"
-        },
-        {
-          "path": "registry/components/index-table/utils/build-graphql-query-from-filter-values.ts",
-          "type": "registry:file",
-          "target": "components/turboost-ui/index-table/utils/build-graphql-query-from-filter-values.ts"
-        },
-        {
-          "path": "registry/components/filter/utils/transform-object-by-fields.ts",
-          "type": "registry:file",
-          "target": "components/turboost-ui/filter/utils/transform-object-by-fields.ts"
-        },
-        {
-          "path": "registry/components/filter/filter.tsx",
-          "type": "registry:component",
-          "target": "components/turboost-ui/filter/filter.tsx"
-        },
-        {
-          "path": "registry/components/table/table.tsx",
-          "type": "registry:component",
-          "target": "components/turboost-ui/table/table.tsx"
-        },
-        {
-          "path": "registry/components/view/view.tsx",
-          "type": "registry:component",
-          "target": "components/turboost-ui/view/view.tsx"
-        },
-        {
-          "path": "registry/components/index-table/order-direction-list.tsx",
-          "type": "registry:component",
-          "target": "components/turboost-ui/index-table/order-direction-list.tsx"
-        },
-        {
-          "path": "registry/components/index-table/index-table.tsx",
-          "type": "registry:component",
-          "target": "components/turboost-ui/index-table/index-table.tsx"
         }
       ]
     },
@@ -160,14 +98,7 @@
       "title": "Complex Filter",
       "description": "A complex filter component with logical operators and nested conditions",
       "dependencies": ["lucide-react"],
-      "registryDependencies": [
-        "button",
-        "input",
-        "select",
-        "dropdown-menu",
-        "@turboost-ui/number-input",
-        "@turboost-ui/date-input"
-      ],
+      "registryDependencies": ["button", "select", "dropdown-menu"],
       "files": [
         {
           "path": "registry/components/complex-filter/complex-filter.tsx",

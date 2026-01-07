@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "use-search-params",
+  "type": "registry:hook",
+  "title": "Use Search Params",
+  "description": "A React hook for parsing search parameters with Zod schema validation",
+  "dependencies": [
+    "react",
+    "zod"
+  ],
+  "registryDependencies": [
+    "@turboost-ui/search-params"
+  ],
+  "files": [
+    {
+      "path": "registry/hooks/use-search-params.ts",
+      "content": "import { useMemo } from \"react\";\nimport {\n  defaultSearchParamsSchema,\n  parseSearchParams,\n} from \"@/registry/lib/search-params\";\nimport z from \"zod\";\n\nexport function useSearchParams<\n  T extends z.ZodType = typeof defaultSearchParamsSchema,\n>(searchStr: string, schema?: T): z.infer<T> {\n  return useMemo(\n    () => parseSearchParams(searchStr, schema),\n    [searchStr, schema],\n  );\n}\n",
+      "type": "registry:file",
+      "target": "hooks/use-search-params.ts"
+    }
+  ]
+}

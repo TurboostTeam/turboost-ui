@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "number-input",
+  "type": "registry:component",
+  "title": "Number Input",
+  "description": "A number input component with formatting support",
+  "dependencies": [
+    "react-number-format"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/components/number-input/number-input.tsx",
+      "content": "\"use client\";\n\nimport { ComponentProps, forwardRef } from \"react\";\nimport { NumericFormat, NumericFormatProps } from \"react-number-format\";\n\nimport { Input } from \"@/components/ui/input\";\n\nexport type NumberInputProps = Omit<\n  NumericFormatProps,\n  \"customInput\" | \"getInputRef\"\n> &\n  ComponentProps<\"input\">;\n\nconst NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(\n  (props, ref) => {\n    return <NumericFormat getInputRef={ref} customInput={Input} {...props} />;\n  },\n);\n\nNumberInput.displayName = \"NumberInput\";\n\nexport { NumberInput };\n",
+      "type": "registry:component",
+      "target": "components/turboost-ui/number-input/number-input.tsx"
+    }
+  ]
+}
