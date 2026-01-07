@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 import { forEach, isPlainObject, omitBy, transform } from "lodash";
 import { ChevronDown, Plus, Search, X } from "lucide-react";
-import { useCallback, useState } from "react";
-import { useForm } from "@tanstack/react-form";
+import { useCallback, useEffect, useState } from "react";
+import { useForm, useStore } from "@tanstack/react-form";
 import type { ReactElement, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -163,6 +163,10 @@ export function Filter({
     },
   });
 
+  const {
+    values: { filter: watchFilter },
+  } = useStore(form.store);
+
   // 将筛选条件分组为固定和非固定两类
   const [{ fixedFilters, unfixedFilters }, setFilterGroups] = useState({
     fixedFilters: filters.filter((item) => item.pinned),
@@ -200,6 +204,16 @@ export function Filter({
     },
     [],
   );
+
+  useEffect(() => {
+    form.setFieldValue("filter", values || {});
+  }, [values, form]);
+
+  useEffect(() => {
+    if (search && "value" in search && typeof search.value === "string") {
+      form.setFieldValue("query", search.value);
+    }
+  }, [search, form]);
 
   return (
     <div className={cn("space-y-3", className)}>
@@ -245,7 +259,7 @@ export function Filter({
         <div className="flex flex-wrap gap-2">
           {fixedFilters.map(({ field, label, icon, render, renderValue }) => {
             const originalFilter = filters.find((item) => item.field === field);
-            const fieldValue = form.getFieldValue(`filter.${field}`);
+            const fieldValue = watchFilter[field];
 
             // 获取筛选条件的值
             const getValue = (): string | undefined => {
