@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "date-input",
+  "type": "registry:component",
+  "title": "Date Input",
+  "description": "A date input component with calendar picker",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "button",
+    "popover",
+    "@turboost-ui/calendar"
+  ],
+  "files": [
+    {
+      "path": "registry/components/date-input/date-input.tsx",
+      "content": "import { forwardRef, useState } from \"react\";\nimport { ChevronDownIcon } from \"lucide-react\";\nimport { Button } from \"@/components/ui/button\";\nimport { Calendar, CalendarProps } from \"../calendar/calendar\";\nimport {\n  Popover,\n  PopoverContent,\n  PopoverTrigger,\n} from \"@/components/ui/popover\";\nimport { cn } from \"@/lib/utils\";\n\nexport interface DateInputProps {\n  /** 当前选中的日期 */\n  value?: Date;\n  /** 日期变化回调 */\n  onChange?: (date: Date | undefined) => void;\n  /** 占位符文本 */\n  placeholder?: string;\n  /** 日期格式化函数 */\n  formatDate?: (date: Date) => string;\n  /** 是否禁用 */\n  disabled?: boolean;\n  /** 自定义类名 */\n  className?: string;\n  /** 按钮变体 */\n  variant?: \"outline\" | \"ghost\" | \"default\";\n  /** Calendar 组件的额外属性 */\n  calendarProps?: Omit<\n    CalendarProps<\"single\">,\n    \"mode\" | \"selected\" | \"onSelect\"\n  >;\n}\n\nconst DateInput = forwardRef<HTMLButtonElement, DateInputProps>(\n  (\n    {\n      value,\n      onChange,\n      placeholder = \"Select date\",\n      formatDate = (date: Date) => date.toLocaleDateString(\"en-US\"),\n      disabled = false,\n      className,\n      variant = \"outline\",\n      calendarProps,\n    },\n    ref,\n  ) => {\n    const [open, setOpen] = useState(false);\n\n    const handleSelect = (date: Date | undefined) => {\n      onChange?.(date);\n      setOpen(false);\n    };\n\n    return (\n      <Popover open={open} onOpenChange={setOpen}>\n        <PopoverTrigger asChild>\n          <Button\n            ref={ref}\n            variant={variant}\n            disabled={disabled}\n            className={cn(\n              \"flex w-full min-w-0 justify-between font-normal\",\n              !value && \"text-muted-foreground\",\n              className,\n            )}\n          >\n            {value ? formatDate(value) : placeholder}\n            <ChevronDownIcon className=\"h-4 w-4 opacity-50\" />\n          </Button>\n        </PopoverTrigger>\n        <PopoverContent className=\"w-auto overflow-hidden p-0\" align=\"start\">\n          <Calendar\n            mode=\"single\"\n            selected={value}\n            onSelect={handleSelect}\n            captionLayout=\"dropdown\"\n            {...calendarProps}\n          />\n        </PopoverContent>\n      </Popover>\n    );\n  },\n);\n\nDateInput.displayName = \"DateInput\";\n\nexport { DateInput };\n",
+      "type": "registry:component",
+      "target": "components/turboost-ui/date-input/date-input.tsx"
+    }
+  ]
+}

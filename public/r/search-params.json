@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "search-params",
+  "type": "registry:lib",
+  "title": "Search Params",
+  "description": "Utilities for parsing and stringifying search parameters",
+  "dependencies": [
+    "zod"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "registry/lib/search-params.ts",
+      "content": "import { z } from \"zod\";\n\nexport const defaultSearchParamsSchema = z.record(z.string(), z.any());\n\nfunction encode(\n  obj: Record<string, any>,\n  stringify: (value: any) => string = String,\n): string {\n  const result = new URLSearchParams();\n\n  for (const key in obj) {\n    const val = obj[key];\n    if (val !== undefined) {\n      result.set(key, stringify(val));\n    }\n  }\n\n  return result.toString();\n}\n\nfunction toValue(str: unknown) {\n  if (!str) return \"\";\n\n  if (str === \"false\") return false;\n  if (str === \"true\") return true;\n  return +str * 0 === 0 && +str + \"\" === str ? +str : str;\n}\n\nfunction decode(str: any): any {\n  const searchParams = new URLSearchParams(str);\n\n  const result: Record<string, unknown> = {};\n\n  for (const [key, value] of searchParams.entries()) {\n    const previousValue = result[key];\n    if (previousValue == null) {\n      result[key] = toValue(value);\n    } else if (Array.isArray(previousValue)) {\n      previousValue.push(toValue(value));\n    } else {\n      result[key] = [previousValue, toValue(value)];\n    }\n  }\n\n  return result;\n}\n\nexport function parseSearchParams<\n  T extends z.ZodType = typeof defaultSearchParamsSchema,\n>(searchStr: string, schema?: T): z.infer<T> {\n  if (searchStr[0] === \"?\") {\n    searchStr = searchStr.substring(1);\n  }\n\n  const query: Record<string, unknown> = decode(searchStr);\n\n  // Try to parse any query params that might be json\n  for (const key in query) {\n    const value = query[key];\n    if (typeof value === \"string\") {\n      try {\n        query[key] = JSON.parse(value);\n      } catch (_err) {\n        // silent\n      }\n    }\n  }\n\n  return (schema ?? defaultSearchParamsSchema).parse(query) as z.infer<T>;\n}\n\nexport function stringifySearchParamsWith() {\n  function stringifyValue(val: any) {\n    if (typeof val === \"object\" && val !== null) {\n      try {\n        return JSON.stringify(val);\n      } catch (_err) {\n        // silent\n      }\n    } else if (typeof val === \"string\") {\n      try {\n        // Check if it's a valid parseable string.\n        // If it is, then stringify it again.\n        JSON.parse(val);\n        return JSON.stringify(val);\n      } catch (_err) {\n        // silent\n      }\n    }\n    return val;\n  }\n\n  return (search: Record<string, any>) => {\n    const searchStr = encode(search, stringifyValue);\n    return searchStr ? `?${searchStr}` : \"\";\n  };\n}\n",
+      "type": "registry:file",
+      "target": "lib/search-params.ts"
+    }
+  ]
+}
