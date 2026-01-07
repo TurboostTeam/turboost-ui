@@ -271,7 +271,6 @@ export function Filter({
             // 移除筛选条件
             const remove = () => {
               form.setFieldValue(`filter.${field}`, undefined);
-              close();
 
               // 如果该筛选条件是非原固定筛选条件，则将其移除
               if (originalFilter?.pinned !== true) {

@@ -193,7 +193,7 @@ export const WithInitialValue: Story = {
       },
     ],
     value: {
-      $and: [{ name: { $eq: "Joe" } }, { age: { $lt: "18" } }],
+      $and: [{ name: { $eq: "Joe" } }, { age: { $lt: 18 } }],
     },
   },
 };

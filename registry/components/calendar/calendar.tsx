@@ -1,7 +1,7 @@
 import { Calendar as BaseCalendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useState } from "react";
 import type {
   PropsMultiRequired,
   PropsRangeRequired,

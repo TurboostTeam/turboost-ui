@@ -16,6 +16,7 @@ export interface PageInfo {
 export interface CreateConnectionSearchSchemaOptions<
   OrderField extends EnumLike,
 > {
+  filterSchema?: z.ZodSchema;
   pageSize: number;
   orderField: OrderField;
   defaultOrderField: OrderField[keyof OrderField];
@@ -54,6 +55,7 @@ export function createConnectionSearchSchema<OrderField extends EnumLike>(
             .default(options.defaultOrderDirection),
         })
         .optional(),
+      ...(options.filterSchema ? { filter: options.filterSchema } : {}),
     })
     .transform((data) => {
       const { first, last, after, before, ...rest } = data;
