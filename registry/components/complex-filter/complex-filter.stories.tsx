@@ -6,6 +6,8 @@ import {
   ComplexFilterType,
   ComplexFilterValue,
 } from "./complex-filter";
+import { Input } from "@/components/ui/input";
+import { NumberInput } from "../number-input/number-input";
 
 const meta = {
   title: "Components/Complex Filter",
@@ -37,16 +39,25 @@ const ComplexFilterWithState = () => {
             field: "name",
             label: "姓名",
             type: ComplexFilterType.STRING,
+            render: ({ value, onChange }) => (
+              <Input value={value} onChange={onChange} />
+            ),
           },
           {
             field: "status",
             label: "状态",
             type: ComplexFilterType.STRING,
+            render: ({ value, onChange }) => (
+              <Input value={value} onChange={onChange} />
+            ),
           },
           {
             field: "age",
             label: "年龄",
             type: ComplexFilterType.NUMBER,
+            render: ({ value, onChange }) => (
+              <NumberInput value={value} onChange={onChange} />
+            ),
           },
           {
             field: "birthday",
@@ -57,6 +68,9 @@ const ComplexFilterWithState = () => {
             field: "createdAt",
             label: "创建时间",
             type: ComplexFilterType.DATETIME,
+            render: ({ value, onChange }) => (
+              <DateTimeInput value={value} onChange={onChange} />
+            ),
           },
           {
             field: "isActive",

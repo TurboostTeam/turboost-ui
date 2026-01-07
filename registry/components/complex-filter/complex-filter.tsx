@@ -1,7 +1,6 @@
-"use client";
-
 import { ChevronDown, Plus, X } from "lucide-react";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { FC, ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +9,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -19,8 +17,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { NumberInput } from "@/registry/components/number-input/number-input";
-import { DateInput } from "@/registry/components/date-input/date-input";
 
 export enum ComplexFilterType {
   STRING = "string",
@@ -39,15 +35,15 @@ export type ComplexFilterEqualityOperator = "$eq" | "$ne";
 
 export type ComplexFilterComparisonOperator = "$gt" | "$gte" | "$lt" | "$lte";
 
-export type ComplexFilterLikeOperator = "$like" | "$nlike";
-
 export type ComplexFilterMembershipOperator = "$in" | "$nin";
+
+export type ComplexFilterFullTextOperator = "$fulltext";
 
 export type ComplexFilterOperator =
   | ComplexFilterEqualityOperator
   | ComplexFilterComparisonOperator
-  | ComplexFilterLikeOperator
-  | ComplexFilterMembershipOperator;
+  | ComplexFilterMembershipOperator
+  | ComplexFilterFullTextOperator;
 
 export type ComplexFilterCondition = Record<
   string,
@@ -55,7 +51,7 @@ export type ComplexFilterCondition = Record<
 >;
 
 export type ComplexFilterGroupValue = {
-  [K in ComplexFilterLogical]?: ComplexFilterValue[];
+  [K in ComplexFilterLogical]?: Array<ComplexFilterValue>;
 };
 
 export type ComplexFilterValue =
@@ -70,8 +66,11 @@ export type ComplexFilterValueFormat = "object" | "string";
 export type ComplexFilterValueByFormat<T extends ComplexFilterValueFormat> =
   T extends "string" ? string : ComplexFilterValue;
 
-const filterOperators: Record<ComplexFilterType, ComplexFilterOperator[]> = {
-  [ComplexFilterType.STRING]: ["$eq", "$ne", "$like", "$nlike"],
+const filterOperators: Record<
+  ComplexFilterType,
+  Array<ComplexFilterOperator>
+> = {
+  [ComplexFilterType.STRING]: ["$eq", "$ne"],
   [ComplexFilterType.NUMBER]: ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte"],
   [ComplexFilterType.BOOLEAN]: ["$eq", "$ne"],
   [ComplexFilterType.DATE]: ["$eq", "$ne", "$gt", "$gte", "$lt", "$lte"],
@@ -82,7 +81,14 @@ export interface ComplexFilterItem {
   type: ComplexFilterType;
   label: string;
   field: string;
-  operators?: ComplexFilterOperator[];
+  render: (options: {
+    filterType: ComplexFilterType;
+    value: any;
+    operator?: ComplexFilterOperator;
+    disabled: boolean;
+    onChange: (value: any) => void;
+  }) => ReactNode;
+  operators?: Array<ComplexFilterOperator>;
 }
 
 export interface ComplexFilterI18n {
@@ -104,10 +110,9 @@ export const defaultComplexFilterI18n: ComplexFilterI18n = {
     $gte: "Greater than or equal",
     $lt: "Less than",
     $lte: "Less than or equal",
-    $like: "Contains",
-    $nlike: "Not contains",
     $in: "Includes",
     $nin: "Excludes",
+    $fulltext: "Contains",
   },
   logicals: {
     $and: "AND",
@@ -175,268 +180,9 @@ function cleanFilterValue(
   }
 }
 
-/**
- * 将运算符转换为 Shopify 搜索语法格式
- */
-function operatorToString(operator: ComplexFilterOperator): string {
-  const operatorMap: Record<ComplexFilterOperator, string> = {
-    $eq: ":",
-    $ne: ":-",
-    $gt: ":>",
-    $gte: ":>=",
-    $lt: ":<",
-    $lte: ":<=",
-    $like: ":",
-    $nlike: ":-",
-    $in: ":",
-    $nin: ":-",
-  };
-  return operatorMap[operator] || ":";
-}
-
-/**
- * 将 ComplexFilterValue 对象转换为 Shopify 搜索语法格式的字符串
- * 例如: { name: { $eq: "Joe" } } 转换为 "name:Joe"
- * 例如: { age: { $gt: 18 } } 转换为 "age:>18"
- * 参考: https://shopify.dev/docs/api/usage/search-syntax
- */
-export function filterValueToString(
-  value: ComplexFilterValue,
-  isNested = false,
-): string {
-  if (isFilterGroup(value)) {
-    const logical =
-      ComplexFilterLogical.AND in value
-        ? ComplexFilterLogical.AND
-        : ComplexFilterLogical.OR;
-    const items = value[logical];
-
-    if (!items || items.length === 0) return "";
-
-    const logicalStr = logical === ComplexFilterLogical.AND ? "AND" : "OR";
-
-    const itemStrings = items
-      .map((item) => {
-        // 递归调用时标记为嵌套
-        if (isFilterGroup(item)) {
-          return filterValueToString(item, true);
-        }
-        return filterValueToString(item, false);
-      })
-      .filter((s) => s !== "");
-
-    if (itemStrings.length === 0) return "";
-
-    // 对于嵌套的子组,需要加括号
-    const joined = itemStrings.join(` ${logicalStr} `);
-
-    // 只有当这是嵌套组时才加括号
-    if (isNested) {
-      return `(${joined})`;
-    }
-
-    return joined;
-  } else {
-    // 处理条件
-    const entries = Object.entries(value);
-    if (entries.length === 0) return "";
-
-    const [field, operatorValuePair] = entries[0];
-    if (!operatorValuePair) return "";
-
-    const operatorEntries = Object.entries(operatorValuePair);
-    if (operatorEntries.length === 0) return "";
-
-    const [operator, targetValue] = operatorEntries[0];
-
-    const operatorStr = operatorToString(operator as ComplexFilterOperator);
-
-    // 格式化值 - Shopify 格式: field:value (字段和值之间没有空格)
-    let valueStr = String(targetValue);
-    if (typeof targetValue === "string" && targetValue.includes(" ")) {
-      valueStr = `"${targetValue}"`;
-    }
-
-    return `${field}${operatorStr}${valueStr}`;
-  }
-}
-
-/**
- * 从 Shopify 格式的字符串解析运算符
- */
-function parseOperatorFromString(
-  opStr: string,
-): ComplexFilterOperator | undefined {
-  const operatorMap: Record<string, ComplexFilterOperator> = {
-    ":": "$eq",
-    ":-": "$ne",
-    ":>": "$gt",
-    ":>=": "$gte",
-    ":<": "$lt",
-    ":<=": "$lte",
-  };
-  return operatorMap[opStr.trim()];
-}
-
-/**
- * 将 Shopify 搜索语法格式的字符串转换回 ComplexFilterValue 对象
- * 例如: "name:Joe AND age:>18" 转换为 { $and: [{ name: { $eq: "Joe" } }, { age: { $gt: 18 } }] }
- * 参考: https://shopify.dev/docs/api/usage/search-syntax
- */
-export function stringToFilterValue(str: string): ComplexFilterValue {
-  const trimmed = str.trim();
-
-  if (!trimmed) {
-    return { [ComplexFilterLogical.AND]: [] };
-  }
-
-  // 运算符映射（按照长度从长到短排序，避免 :>= 被匹配为 :>）
-  const operatorPatterns: Array<{
-    pattern: string;
-    operator: ComplexFilterOperator;
-  }> = [
-    { pattern: ":>=", operator: "$gte" },
-    { pattern: ":<=", operator: "$lte" },
-    { pattern: ":-", operator: "$ne" },
-    { pattern: ":>", operator: "$gt" },
-    { pattern: ":<", operator: "$lt" },
-    { pattern: ":", operator: "$eq" },
-  ];
-
-  /**
-   * 按逻辑运算符拆分字符串，但要考虑括号嵌套
-   */
-  const splitByLogical = (expr: string, logicalOp: string): string[] | null => {
-    const parts: string[] = [];
-    let current = "";
-    let depth = 0;
-    let i = 0;
-
-    while (i < expr.length) {
-      const char = expr[i];
-
-      if (char === "(") {
-        depth++;
-        current += char;
-        i++;
-      } else if (char === ")") {
-        depth--;
-        current += char;
-        i++;
-      } else if (depth === 0) {
-        // 只在括号外层检查逻辑运算符
-        const remaining = expr.substring(i);
-        const regex = new RegExp(`^\\s+(${logicalOp})\\s+`, "i");
-        const match = remaining.match(regex);
-
-        if (match) {
-          parts.push(current.trim());
-          current = "";
-          i += match[0].length;
-        } else {
-          current += char;
-          i++;
-        }
-      } else {
-        current += char;
-        i++;
-      }
-    }
-
-    if (current.trim()) {
-      parts.push(current.trim());
-    }
-
-    return parts.length > 1 ? parts : null;
-  };
-
-  // 解析表达式
-  const parseExpression = (expr: string): ComplexFilterValue => {
-    expr = expr.trim();
-    let hadParens = false;
-
-    // 检查是否被括号包围且是完整配对
-    if (expr.startsWith("(") && expr.endsWith(")")) {
-      let depth = 0;
-      let isWrapped = true;
-
-      for (let i = 0; i < expr.length; i++) {
-        if (expr[i] === "(") depth++;
-        if (expr[i] === ")") depth--;
-
-        // 如果在中间位置深度降为 0，说明不是完整包围
-        if (depth === 0 && i < expr.length - 1) {
-          isWrapped = false;
-          break;
-        }
-      }
-
-      if (isWrapped) {
-        hadParens = true;
-        expr = expr.slice(1, -1).trim();
-      }
-    }
-
-    // 先尝试 OR (优先级更高)
-    let parts = splitByLogical(expr, "OR");
-    if (parts) {
-      const items = parts.map((part) => parseExpression(part));
-      return { [ComplexFilterLogical.OR]: items };
-    }
-
-    // 再尝试 AND
-    parts = splitByLogical(expr, "AND");
-    if (parts) {
-      const items = parts.map((part) => parseExpression(part));
-      return { [ComplexFilterLogical.AND]: items };
-    }
-
-    // 尝试解析为条件 - Shopify 格式: field:value (没有空格)
-    for (const { pattern, operator } of operatorPatterns) {
-      // 需要转义特殊字符
-      const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const regex = new RegExp(`^(.+?)${escapedPattern}(.+)$`);
-      const match = expr.match(regex);
-
-      if (match) {
-        const field = match[1].trim();
-        let value: any = match[2].trim();
-
-        // 移除值周围的引号
-        if (
-          (value.startsWith('"') && value.endsWith('"')) ||
-          (value.startsWith("'") && value.endsWith("'"))
-        ) {
-          value = value.slice(1, -1);
-        }
-
-        // 尝试转换为数字
-        const numValue = Number(value);
-        if (!isNaN(numValue) && value !== "") {
-          value = numValue;
-        }
-
-        const condition = { [field]: { [operator]: value } };
-
-        // 如果原本有括号，包装成子组
-        if (hadParens) {
-          return { [ComplexFilterLogical.AND]: [condition] };
-        }
-
-        return condition;
-      }
-    }
-
-    // 无法解析，返回空
-    return { [ComplexFilterLogical.AND]: [] };
-  };
-
-  return parseExpression(trimmed);
-}
-
 export interface ComplexFilterConditionRowProps {
   i18n: ComplexFilterI18n;
-  filters: ComplexFilterItem[];
+  filters: Array<ComplexFilterItem>;
   value: ComplexFilterCondition;
   onChange: (value: ComplexFilterCondition) => void;
   onRemove: () => void;
@@ -497,9 +243,10 @@ export const ComplexFilterConditionRow: FC<ComplexFilterConditionRowProps> = ({
   return (
     <div className="flex items-center gap-2">
       <Select value={field} onValueChange={handleFieldChange}>
-        <SelectTrigger className="min-w-[200px]">
+        <SelectTrigger className="min-w-[150px]">
           <SelectValue placeholder={i18n.selectField} />
         </SelectTrigger>
+
         <SelectContent>
           {filters.map((filter) => (
             <SelectItem key={filter.field} value={filter.field}>
@@ -517,6 +264,7 @@ export const ComplexFilterConditionRow: FC<ComplexFilterConditionRowProps> = ({
         <SelectTrigger className="min-w-[150px]">
           <SelectValue placeholder={i18n.selectOperator} />
         </SelectTrigger>
+
         <SelectContent>
           {operators.map((op) => (
             <SelectItem key={op} value={op}>
@@ -526,34 +274,13 @@ export const ComplexFilterConditionRow: FC<ComplexFilterConditionRowProps> = ({
         </SelectContent>
       </Select>
 
-      {selectedFilter?.type === ComplexFilterType.NUMBER ? (
-        <NumberInput
-          className="min-w-[200px] flex-1"
-          placeholder={i18n.selectValue}
-          value={targetValue ?? ""}
-          onValueChange={(values) => handleValueChange(values.floatValue)}
-          disabled={!operator}
-        />
-      ) : selectedFilter?.type === ComplexFilterType.DATE ||
-        selectedFilter?.type === ComplexFilterType.DATETIME ? (
-        <DateInput
-          className="min-w-[200px] flex-1"
-          placeholder={i18n.selectValue}
-          value={targetValue ? new Date(targetValue) : undefined}
-          onChange={(date) =>
-            handleValueChange(date ? date.toISOString() : undefined)
-          }
-          disabled={!operator}
-        />
-      ) : (
-        <Input
-          className="min-w-[200px] flex-1"
-          placeholder={i18n.selectValue}
-          value={targetValue ?? ""}
-          onChange={(e) => handleValueChange(e.target.value)}
-          disabled={!operator}
-        />
-      )}
+      {selectedFilter?.render({
+        filterType: selectedFilter?.type,
+        value: targetValue,
+        operator,
+        disabled: !operator,
+        onChange: handleValueChange,
+      })}
 
       <Button variant="ghost" size="icon" onClick={onRemove}>
         <X className="h-4 w-4" />
@@ -564,7 +291,7 @@ export const ComplexFilterConditionRow: FC<ComplexFilterConditionRowProps> = ({
 
 export interface ComplexFilterGroupProps {
   i18n: ComplexFilterI18n;
-  filters: ComplexFilterItem[];
+  filters: Array<ComplexFilterItem>;
   value: ComplexFilterGroupValue;
   onChange: (value: ComplexFilterGroupValue) => void;
   onRemove?: () => void;
@@ -577,7 +304,7 @@ export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
   onChange,
   onRemove,
 }) => {
-  const [logical, items]: [ComplexFilterLogical, ComplexFilterValue[]] =
+  const [logical, items]: [ComplexFilterLogical, Array<ComplexFilterValue>] =
     useMemo(() => {
       if (
         ComplexFilterLogical.AND in value &&
@@ -715,9 +442,9 @@ export const ComplexFilterGroup: FC<ComplexFilterGroupProps> = ({
 export interface ComplexFilterProps<
   TFormat extends ComplexFilterValueFormat = "object",
 > {
-  filters: ComplexFilterItem[];
+  filters: Array<ComplexFilterItem>;
   i18n?: ComplexFilterI18n;
-  valueFormat?: TFormat;
+  showClearAll?: boolean;
   value?: ComplexFilterValueByFormat<TFormat>;
   onChange?: (value: ComplexFilterValueByFormat<TFormat>) => void;
 }
@@ -727,9 +454,9 @@ export const ComplexFilter = <
 >({
   i18n = defaultComplexFilterI18n,
   filters,
+  showClearAll = false,
   value,
   onChange,
-  valueFormat = "object" as TFormat,
 }: ComplexFilterProps<TFormat>) => {
   // 内部维护完整的 value（包括空条件），用于 UI 显示和编辑
   const [internalDisplayValue, setInternalDisplayValue] =
@@ -748,9 +475,7 @@ export const ComplexFilter = <
 
       // 根据 valueFormat 处理输入值
       let objectValue: ComplexFilterValue;
-      if (valueFormat === "string" && typeof value === "string") {
-        objectValue = stringToFilterValue(value);
-      } else if (typeof value === "object") {
+      if (typeof value === "object") {
         objectValue = value;
       } else {
         objectValue = { [ComplexFilterLogical.AND]: [] };
@@ -764,7 +489,7 @@ export const ComplexFilter = <
         setInternalDisplayValue(objectValue);
       }
     }
-  }, [value, valueFormat, i18n]);
+  }, [value, i18n]);
 
   const handleChange = (newValue: ComplexFilterValue) => {
     // 内部保存完整的 value（包括空条件）
@@ -780,13 +505,7 @@ export const ComplexFilter = <
       if (finalValueStr !== lastCleanedValueStrRef.current) {
         lastCleanedValueStrRef.current = finalValueStr;
 
-        // 根据 valueFormat 输出不同格式
-        if (valueFormat === "string") {
-          const stringValue = filterValueToString(finalObjectValue);
-          onChange(stringValue as ComplexFilterValueByFormat<TFormat>);
-        } else {
-          onChange(finalObjectValue as ComplexFilterValueByFormat<TFormat>);
-        }
+        onChange(finalObjectValue as ComplexFilterValueByFormat<TFormat>);
       }
     }
   };
@@ -798,12 +517,7 @@ export const ComplexFilter = <
       const emptyValueStr = JSON.stringify(emptyValue);
       lastCleanedValueStrRef.current = emptyValueStr;
 
-      // 根据 valueFormat 输出不同格式
-      if (valueFormat === "string") {
-        onChange("" as ComplexFilterValueByFormat<TFormat>);
-      } else {
-        onChange(emptyValue as unknown as ComplexFilterValueByFormat<TFormat>);
-      }
+      onChange(emptyValue as unknown as ComplexFilterValueByFormat<TFormat>);
     }
   };
 
@@ -816,11 +530,14 @@ export const ComplexFilter = <
           value={internalDisplayValue}
           onChange={handleChange}
         />
-        <div className="flex justify-end">
-          <Button variant="ghost" size="sm" onClick={handleClearAll}>
-            {i18n.clearAll}
-          </Button>
-        </div>
+
+        {showClearAll && (
+          <div className="flex justify-end">
+            <Button variant="ghost" size="sm" onClick={handleClearAll}>
+              {i18n.clearAll}
+            </Button>
+          </div>
+        )}
       </div>
     );
   }

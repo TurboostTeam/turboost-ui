@@ -1,16 +1,10 @@
 import dayjs from "dayjs";
 import { forEach, isPlainObject, omitBy, transform } from "lodash";
 import { ChevronDown, Plus, Search, X } from "lucide-react";
-import {
-  type ReactElement,
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { Controller, useForm } from "react-hook-form";
-
+import { useCallback, useEffect, useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import type { ReactElement, ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -19,18 +13,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
-import { type Field } from "@/registry/types/field";
 
 const isEmpty = (value: unknown): boolean => {
   return (
@@ -40,10 +32,10 @@ const isEmpty = (value: unknown): boolean => {
   );
 };
 
-const omitEmpty = (obj: any): any => omitBy(obj, isEmpty);
+const omitEmpty = (obj: FilterValues): FilterValues => omitBy(obj, isEmpty);
 
-const formatRenderValue = (obj: any): any => {
-  return transform<any, any>(
+const formatRenderValue = (obj: FilterValues): FilterValues => {
+  return transform<FilterValues, FilterValues>(
     obj,
     (result, value, key) => {
       if (isPlainObject(value) || Array.isArray(value)) {
@@ -72,11 +64,11 @@ const formatRenderValue = (obj: any): any => {
   );
 };
 
-const flattenObject = (obj: any): any => {
-  return transform<any, any>(
+const flattenObject = (obj: FilterValues): FilterValues => {
+  return transform<FilterValues, FilterValues>(
     obj,
     (result, value, key) => {
-      if (typeof key === "string" && isPlainObject(value)) {
+      if (isPlainObject(value)) {
         const nested = flattenObject(value);
         forEach(nested, (nestedValue, nestedKey) => {
           result[`${key}.${nestedKey}`] = nestedValue;
@@ -89,16 +81,10 @@ const flattenObject = (obj: any): any => {
   );
 };
 
-export type FilterTypeValue =
-  | StringConstructor
-  | NumberConstructor
-  | BooleanConstructor
-  | DateConstructor
-  | ArrayConstructor;
-
-export interface FilterItemProps<T> {
+export interface FilterItemProps {
   label: string;
-  field: Field<T>;
+  field: string;
+  icon?: ReactNode;
   render: ({
     field: { value, onChange },
   }: {
@@ -109,49 +95,68 @@ export interface FilterItemProps<T> {
   }) => ReactElement;
   renderValue?: (options: {
     label: string;
-    field: Field<T>;
+    field: string;
     value: any;
   }) => ReactNode;
   pinned?: boolean;
-  type?: FilterTypeValue;
-  itemType?: FilterTypeValue;
 }
 
 export interface FilterSearchConfig {
-  querySuffix?: ReactNode;
-  queryPrefix?: ReactNode;
-  queryPlaceholder?: string;
+  value?: string;
+  // 搜索框左侧扩展内容
+  leading?: ReactNode;
+  // 搜索框右侧扩展内容
+  trailing?: ReactNode;
+  suffix?: ReactNode;
+  prefix?: ReactNode;
+  placeholder?: string;
   disabled?: boolean;
+  className?: string;
+  onChange?: (value: string) => void;
 }
 
-export interface FilterProps<T> {
+export interface FilterI18n {
+  addFilter?: string;
+}
+
+export type FilterValues = Record<string, any>;
+
+export interface FilterRenderers {
+  addFilter?: () => ReactNode;
+  filterItem?: (props: {
+    label: string;
+    field: string;
+    icon?: ReactNode;
+    value: string | undefined;
+    remove: () => void;
+  }) => ReactNode;
+}
+
+export interface FilterProps {
   className?: string;
   loading?: boolean;
-  filters?: Array<FilterItemProps<T>>;
-  extra?: ReactNode;
+  filters: Array<FilterItemProps>;
   search?: false | FilterSearchConfig;
-  values?: Record<Field<T>, any> & { query?: string };
-  onChange?: (value: Record<Field<T>, any> & { query?: string }) => void;
-  t?: Function;
+  values?: FilterValues;
+  renderers?: FilterRenderers;
+  i18n?: FilterI18n;
+  onChange?: (values: FilterValues) => void;
 }
 
-export function Filter<T>({
+export function Filter({
   className,
   loading = false,
-  filters = [],
-  extra,
+  filters,
   search,
   values,
+  i18n,
+  renderers,
   onChange,
-  t,
-}: FilterProps<T>): ReactElement {
-  const translate = useMemo(() => {
-    return typeof t === "function" ? t : () => undefined;
-  }, [t]);
-
-  const { control, setValue, watch, reset } = useForm<any>({
+}: FilterProps): ReactElement {
+  const form = useForm({
     defaultValues: {
       query: "",
+      filter: {},
     },
   });
 
@@ -161,13 +166,13 @@ export function Filter<T>({
     unfixedFilters: filters.filter((item) => item.pinned !== true),
   });
 
-  const handleChange = useCallback(() => {
-    onChange?.(omitEmpty(flattenObject(watch())));
-  }, [onChange, watch]);
+  const handleFiltersChange = useCallback(() => {
+    onChange?.(omitEmpty(flattenObject(form.state.values.filter)));
+  }, [onChange, form]);
 
   // 设置筛选条件固定状态
   const setFilterFieldPinnedStatus = useCallback(
-    (field: Field<T>, pinned: boolean) => {
+    (field: string, pinned: boolean) => {
       setFilterGroups((prev) => {
         return {
           ...prev,
@@ -194,80 +199,97 @@ export function Filter<T>({
   );
 
   useEffect(() => {
-    // 获取当前表单中所有字段的值
-    const currentFormValues = watch();
-    // 准备新的表单值
-    const newFormValues = { ...currentFormValues };
+    form.setFieldValue("filter", values || {});
+  }, [values, form]);
 
-    // 将所有在 watch() 中但不在 values 中的字段设置为 undefined
-    Object.keys(currentFormValues).forEach((key) => {
-      if (
-        typeof values !== "undefined" &&
-        !Object.prototype.hasOwnProperty.call(values, key)
-      ) {
-        newFormValues[key] = undefined;
-      }
-    });
-
-    // 将 values 中的值应用到表单
-    if (typeof values !== "undefined") {
-      Object.keys(values).forEach((key) => {
-        newFormValues[key as keyof typeof values] =
-          values[key as keyof typeof values];
-      });
+  // 如果 search 有 value 属性，则将 value 应用到表单
+  useEffect(() => {
+    if (search && "value" in search && typeof search.value === "string") {
+      form.setFieldValue("query", search.value);
     }
-
-    // 重置表单，应用新的值
-    reset(newFormValues);
-  }, [values, watch, reset]);
+  }, [search, form]);
 
   return (
     <div className={cn("space-y-3", className)}>
-      {!(
-        (typeof search === "undefined" || search === false) &&
-        typeof extra === "undefined"
-      ) && (
+      {typeof search !== "undefined" && search !== false && (
         <div className="flex items-center gap-2">
-          {typeof search !== "undefined" && search !== false && (
-            <Controller<{ query: string }>
-              control={control}
-              name="query"
-              render={({ field }) => (
-                <InputGroup>
-                  <InputGroupInput
-                    disabled={field?.disabled ?? search?.disabled}
-                    placeholder={search?.queryPlaceholder}
-                    value={field.value}
-                    onChange={(value) => {
-                      field.onChange(value);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && typeof search !== "undefined") {
-                        e.preventDefault();
-                        handleChange();
-                      }
-                    }}
-                  />
-                  <InputGroupAddon>
-                    {search?.queryPrefix ?? <Search />}
-                  </InputGroupAddon>
-                  <InputGroupAddon align="inline-end">
-                    {loading ? <Spinner /> : search?.querySuffix}
-                  </InputGroupAddon>
-                </InputGroup>
-              )}
-            />
-          )}
+          {search?.leading}
 
-          {extra}
+          <form.Field
+            name="query"
+            children={({ state: { value }, handleChange, handleBlur }) => (
+              <InputGroup className={search?.className}>
+                <InputGroupInput
+                  value={value}
+                  onChange={(e) => {
+                    handleChange(e.target.value);
+                  }}
+                  onBlur={handleBlur}
+                  placeholder={search?.placeholder}
+                  disabled={search?.disabled}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+
+                      search?.onChange?.(value);
+                    }
+                  }}
+                />
+                <InputGroupAddon>
+                  {search?.prefix ?? <Search />}
+                </InputGroupAddon>
+                <InputGroupAddon align="inline-end">
+                  {loading ? <Spinner /> : search?.suffix}
+                </InputGroupAddon>
+              </InputGroup>
+            )}
+          />
+
+          {search?.trailing}
         </div>
       )}
 
       {filters.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {fixedFilters.map(({ field, label, render, renderValue }) => {
+          {fixedFilters.map(({ field, label, icon, render, renderValue }) => {
             const originalFilter = filters.find((item) => item.field === field);
-            const fieldValue = watch(field);
+            const fieldValue = form.getFieldValue(`filter.${field}`);
+
+            // 获取筛选条件的值
+            const getValue = (): string | undefined => {
+              if (isEmpty(fieldValue)) {
+                return undefined;
+              } else {
+                return String(
+                  typeof renderValue !== "undefined"
+                    ? renderValue({
+                        field,
+                        label,
+                        value: formatRenderValue({
+                          [field]: fieldValue,
+                        })[field],
+                      })
+                    : formatRenderValue({
+                        [field]: fieldValue,
+                      })[field],
+                );
+              }
+            };
+
+            // 移除筛选条件
+            const remove = () => {
+              form.setFieldValue(`filter.${field}`, undefined);
+              close();
+
+              // 如果该筛选条件是非原固定筛选条件，则将其移除
+              if (originalFilter?.pinned !== true) {
+                setFilterFieldPinnedStatus(field, false);
+              }
+
+              handleFiltersChange();
+            };
+
+            const value = getValue();
 
             return (
               <Popover
@@ -288,67 +310,50 @@ export function Filter<T>({
                 key={field}
               >
                 <PopoverTrigger asChild className="whitespace-normal">
-                  <Badge
-                    variant="outline"
-                    className="hover:bg-accent rounded-full px-2 py-1"
-                  >
-                    <span className="flex items-center gap-1">
-                      {isEmpty(fieldValue) ? (
-                        <>
-                          <span>{label}</span>{" "}
-                          <ChevronDown className="size-4" />
-                        </>
-                      ) : (
-                        <>
-                          <span>
-                            {`${label}: ${String(
-                              typeof renderValue !== "undefined"
-                                ? renderValue({
-                                    field,
-                                    label,
-                                    value: formatRenderValue({
-                                      [field]: fieldValue,
-                                    })[field],
-                                  })
-                                : formatRenderValue({ [field]: fieldValue })[
-                                    field
-                                  ],
-                            )}`}
-                          </span>
+                  {typeof renderers?.filterItem !== "undefined" ? (
+                    renderers?.filterItem({
+                      label,
+                      icon,
+                      field,
+                      value,
+                      remove,
+                    })
+                  ) : (
+                    <Badge
+                      variant="outline"
+                      className="hover:bg-accent rounded-full px-2 py-1"
+                    >
+                      <div className="flex items-center gap-1">
+                        <span>
+                          {value ? `${label}: ${value}` : `${label}`}{" "}
+                        </span>
 
+                        {!value && <ChevronDown className="size-4" />}
+
+                        {value && (
                           <X
                             className="size-4 shrink-0 cursor-pointer"
                             onClick={(event) => {
                               event.stopPropagation();
-                              close();
-                              setValue(field, undefined as any);
-
-                              // 如果该筛选条件是非原固定筛选条件，则将其移除
-                              if (originalFilter?.pinned !== true) {
-                                setFilterFieldPinnedStatus(field, false);
-                              }
-
-                              handleChange();
+                              remove();
                             }}
                           />
-                        </>
-                      )}
-                    </span>
-                  </Badge>
+                        )}
+                      </div>
+                    </Badge>
+                  )}
                 </PopoverTrigger>
 
                 <PopoverContent className="w-fit">
-                  <Controller
-                    control={control}
-                    name={field}
-                    render={(renderProps) =>
+                  <form.Field
+                    name={`filter.${field}`}
+                    children={({ state: { value }, handleChange: onChange }) =>
                       render({
-                        ...renderProps,
                         field: {
-                          ...renderProps.field,
+                          value,
                           onChange: (value) => {
-                            renderProps.field.onChange(value);
-                            handleChange();
+                            onChange(value);
+                            handleFiltersChange();
                           },
                         },
                       })
@@ -362,13 +367,17 @@ export function Filter<T>({
           {unfixedFilters.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Badge
-                  variant="outline"
-                  className="hover:bg-accent rounded-full px-2 py-1"
-                >
-                  <span>{translate("turboost_ui.filters.add_filter")}</span>
-                  <Plus className="size-4 shrink-0" />
-                </Badge>
+                {typeof renderers?.addFilter !== "undefined" ? (
+                  renderers?.addFilter()
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className="hover:bg-accent rounded-full px-2 py-1"
+                  >
+                    <span>{i18n?.addFilter ?? "Add Filter"}</span>
+                    <Plus className="size-4 shrink-0" />
+                  </Badge>
+                )}
               </DropdownMenuTrigger>
 
               <DropdownMenuContent>
