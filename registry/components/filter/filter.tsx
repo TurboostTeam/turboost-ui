@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { forEach, isPlainObject, omitBy, transform } from "lodash";
 import { ChevronDown, Plus, Search, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import type { ReactElement, ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -155,8 +155,11 @@ export function Filter({
 }: FilterProps): ReactElement {
   const form = useForm({
     defaultValues: {
-      query: "",
-      filter: {},
+      query:
+        search && "value" in search && typeof search.value === "string"
+          ? search.value
+          : "",
+      filter: values || {},
     },
   });
 
@@ -197,17 +200,6 @@ export function Filter({
     },
     [],
   );
-
-  useEffect(() => {
-    form.setFieldValue("filter", values || {});
-  }, [values, form]);
-
-  // 如果 search 有 value 属性，则将 value 应用到表单
-  useEffect(() => {
-    if (search && "value" in search && typeof search.value === "string") {
-      form.setFieldValue("query", search.value);
-    }
-  }, [search, form]);
 
   return (
     <div className={cn("space-y-3", className)}>
