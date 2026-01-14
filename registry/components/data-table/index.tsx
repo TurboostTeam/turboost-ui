@@ -186,7 +186,7 @@ export function DataTable<TData extends RowData, TValue = unknown>({
       <div className="relative overflow-auto rounded-md border">
         {/* batch actions */}
         {Object.keys(rowSelection).length > 0 && (
-          <div className="bg-background absolute top-0 left-0 z-100 flex h-10 w-full items-center gap-2 px-2">
+          <div className="bg-background absolute top-0 left-0 z-50 flex h-10 w-full items-center gap-2 px-2">
             <Checkbox
               checked={
                 table.getIsAllPageRowsSelected() ||
