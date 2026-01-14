@@ -172,7 +172,8 @@ export function DataTable<TData extends RowData, TValue = unknown>({
     onRowSelectionChangeRef.current?.(
       table.getSelectedRowModel().rows.map((row) => row.original),
     );
-  }, [rowSelection, data.length]);
+    // 如果行选择发生变化，则更新全选状态，另外如果数据长度发生变化，如删除某行，则更新全选状态，内部用了 table，所以依赖了 table
+  }, [rowSelection, data.length, table]);
 
   // 处理全选操作
   const handleAllRowsSelectedChange = useCallback((selected: boolean) => {
@@ -299,7 +300,7 @@ export function DataTable<TData extends RowData, TValue = unknown>({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={tableColumns.length}
                   className="bg-background h-24 text-center"
                 >
                   No results.
