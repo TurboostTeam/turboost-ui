@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 
-import { DataTable } from "./index";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
+
+import { DataTable } from "./index";
 
 const meta = {
   title: "Components/Data Table",

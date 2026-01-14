@@ -1,13 +1,5 @@
 "use client";
 
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { ButtonGroup } from "@/components/ui/button-group";
-import { useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import type {
   Column,
   ColumnDef,
@@ -15,8 +7,25 @@ import type {
   RowSelectionState,
   TableOptions,
 } from "@tanstack/react-table";
-
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -25,15 +34,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 function getCommonPinningStyles<TData>(column: Column<TData>): CSSProperties {
@@ -127,17 +127,26 @@ export function DataTable<TData extends RowData, TValue = unknown>({
         : []),
       ...columns,
     ];
-  }, [columns]);
+  }, [columns, !!onRowSelectionChange]);
 
   const tableColumns: Array<ColumnDef<TData, TValue>> = useMemo(() => {
     return columnsWithSelection.map((column) => ({
       accessorKey: column.id,
       ...column,
     }));
-  }, [columnsWithSelection, onRowSelectionChange]);
+  }, [columnsWithSelection]);
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isAllPageRowsSelected, setIsAllPageRowsSelected] = useState(false);
+
+  // 使用 useRef 存储外部回调，避免在 useEffect 依赖中引用导致无限循环
+  const onRowSelectionChangeRef = useRef(onRowSelectionChange);
+  const onAllRowsSelectedChangeRef = useRef(onAllRowsSelectedChange);
+
+  useEffect(() => {
+    onRowSelectionChangeRef.current = onRowSelectionChange;
+    onAllRowsSelectedChangeRef.current = onAllRowsSelectedChange;
+  }, [onRowSelectionChange, onAllRowsSelectedChange]);
 
   const table = useReactTable<TData>({
     data,
@@ -159,18 +168,17 @@ export function DataTable<TData extends RowData, TValue = unknown>({
   });
 
   useEffect(() => {
-    onRowSelectionChange?.(
+    // 调用行选择变化回调
+    onRowSelectionChangeRef.current?.(
       table.getSelectedRowModel().rows.map((row) => row.original),
     );
+  }, [rowSelection, data.length]);
 
-    if (table.getSelectedRowModel().rows.length !== table.getRowCount()) {
-      setIsAllPageRowsSelected(false);
-    }
-  }, [onRowSelectionChange, table.getSelectedRowModel().rows]);
-
-  useEffect(() => {
-    onAllRowsSelectedChange?.(isAllPageRowsSelected);
-  }, [isAllPageRowsSelected, onAllRowsSelectedChange]);
+  // 处理全选操作
+  const handleAllRowsSelectedChange = useCallback((selected: boolean) => {
+    setIsAllPageRowsSelected(selected);
+    onAllRowsSelectedChangeRef.current?.(selected);
+  }, []);
 
   return (
     <div>
@@ -211,7 +219,7 @@ export function DataTable<TData extends RowData, TValue = unknown>({
                     <DropdownMenuItem
                       onClick={() => {
                         table.toggleAllPageRowsSelected(true);
-                        setIsAllPageRowsSelected(true);
+                        handleAllRowsSelectedChange(true);
                       }}
                     >
                       Select all
@@ -219,7 +227,10 @@ export function DataTable<TData extends RowData, TValue = unknown>({
                   )}
 
                   <DropdownMenuItem
-                    onClick={() => table.toggleAllPageRowsSelected(false)}
+                    onClick={() => {
+                      table.toggleAllPageRowsSelected(false);
+                      handleAllRowsSelectedChange(false);
+                    }}
                   >
                     Unselect all
                   </DropdownMenuItem>
