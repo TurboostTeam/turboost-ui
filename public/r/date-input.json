@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "date-input",
-  "type": "registry:component",
   "title": "Date Input",
   "description": "A date input component with calendar picker",
   "dependencies": [
@@ -19,5 +18,6 @@
       "type": "registry:component",
       "target": "components/turboost-ui/date-input/date-input.tsx"
     }
-  ]
+  ],
+  "type": "registry:component"
 }

@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "tags-input",
-  "type": "registry:component",
   "title": "Tags Input",
   "description": "A tags input component",
   "dependencies": [
@@ -18,5 +17,6 @@
       "type": "registry:component",
       "target": "components/turboost-ui/tags-input/tags-input.tsx"
     }
-  ]
+  ],
+  "type": "registry:component"
 }

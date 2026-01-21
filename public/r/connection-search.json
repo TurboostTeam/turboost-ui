@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "connection-search",
-  "type": "registry:lib",
   "title": "Connection Search",
   "description": "Utilities for creating GraphQL Connection-style pagination search schemas with Zod",
   "dependencies": [
@@ -15,5 +14,6 @@
       "type": "registry:file",
       "target": "lib/connection-search.ts"
     }
-  ]
+  ],
+  "type": "registry:lib"
 }

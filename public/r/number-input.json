@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "number-input",
-  "type": "registry:component",
   "title": "Number Input",
   "description": "A number input component with formatting support",
   "dependencies": [
@@ -15,5 +14,6 @@
       "type": "registry:component",
       "target": "components/turboost-ui/number-input/number-input.tsx"
     }
-  ]
+  ],
+  "type": "registry:component"
 }

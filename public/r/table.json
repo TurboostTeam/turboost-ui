@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "table",
-  "type": "registry:block",
   "title": "Table",
   "description": "A table component",
   "dependencies": [
@@ -22,5 +21,6 @@
       "type": "registry:component",
       "target": "components/turboost-ui/table/table.tsx"
     }
-  ]
+  ],
+  "type": "registry:block"
 }

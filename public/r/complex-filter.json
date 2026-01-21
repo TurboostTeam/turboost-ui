@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "complex-filter",
-  "type": "registry:block",
   "title": "Complex Filter",
   "description": "A complex filter component with logical operators and nested conditions",
   "dependencies": [
@@ -19,5 +18,6 @@
       "type": "registry:component",
       "target": "components/turboost-ui/complex-filter/complex-filter.tsx"
     }
-  ]
+  ],
+  "type": "registry:block"
 }

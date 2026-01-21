@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "view",
-  "type": "registry:component",
   "title": "View",
   "description": "A view component",
   "dependencies": [
@@ -23,5 +22,6 @@
       "type": "registry:component",
       "target": "components/turboost-ui/view/view.tsx"
     }
-  ]
+  ],
+  "type": "registry:component"
 }

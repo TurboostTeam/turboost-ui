@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "calendar",
-  "type": "registry:block",
   "title": "Calendar",
   "description": "A calendar component with presets support",
   "dependencies": [
@@ -19,5 +18,6 @@
       "type": "registry:component",
       "target": "components/turboost-ui/calendar/calendar.tsx"
     }
-  ]
+  ],
+  "type": "registry:block"
 }

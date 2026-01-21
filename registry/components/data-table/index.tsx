@@ -1,13 +1,5 @@
 "use client";
 
-import type {
-  Column,
-  ColumnDef,
-  Row,
-  RowData,
-  RowSelectionState,
-  TableOptions,
-} from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
@@ -19,8 +11,16 @@ import {
   ChevronRight,
   MoreHorizontal,
 } from "lucide-react";
-import type { CSSProperties, Key, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties, Key, ReactNode } from "react";
+import type {
+  Column,
+  ColumnDef,
+  Row,
+  RowData,
+  RowSelectionState,
+  TableOptions,
+} from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -154,7 +154,11 @@ export function DataTable<TData extends RowData, TValue = unknown>({
               cell: ({ row }) => (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="cursor-pointer"
+                    >
                       <MoreHorizontal />
                     </Button>
                   </DropdownMenuTrigger>
@@ -183,6 +187,7 @@ export function DataTable<TData extends RowData, TValue = unknown>({
                   </DropdownMenuContent>
                 </DropdownMenu>
               ),
+              size: 60,
               pinned: "right",
             } satisfies DataTableColumnProps<TData, TValue>,
           ]
@@ -307,13 +312,16 @@ export function DataTable<TData extends RowData, TValue = unknown>({
         <Table className="bg-background table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow
+                key={headerGroup.id}
+                className="group bg-background hover:bg-muted"
+              >
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
                       key={header.id}
                       className={cn(
-                        "whitespace-normal",
+                        "bg-background group-hover:bg-muted whitespace-normal",
                         getCommonPinningClassNames<TData>(header.column),
                       )}
                       style={{
@@ -338,14 +346,17 @@ export function DataTable<TData extends RowData, TValue = unknown>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={cn(onRowClick && "cursor-pointer")}
+                  className={cn(
+                    "group bg-background hover:bg-muted",
+                    onRowClick && "cursor-pointer",
+                  )}
                   {...(onRowClick ? { onClick: () => onRowClick?.(row) } : {})}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        "whitespace-normal",
+                        "bg-background group-hover:bg-muted whitespace-normal",
                         getCommonPinningClassNames<TData>(cell.column),
                         cell.column.id === "$actions" && "text-right",
                       )}

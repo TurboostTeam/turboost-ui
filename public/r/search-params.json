@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "search-params",
-  "type": "registry:lib",
   "title": "Search Params",
   "description": "Utilities for parsing and stringifying search parameters",
   "dependencies": [
@@ -15,5 +14,6 @@
       "type": "registry:file",
       "target": "lib/search-params.ts"
     }
-  ]
+  ],
+  "type": "registry:lib"
 }

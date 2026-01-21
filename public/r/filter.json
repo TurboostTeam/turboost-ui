@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "filter",
-  "type": "registry:block",
   "title": "Filter",
   "description": "A filter component",
   "dependencies": [
@@ -30,5 +29,6 @@
       "type": "registry:component",
       "target": "components/turboost-ui/filter/filter.tsx"
     }
-  ]
+  ],
+  "type": "registry:block"
 }
