@@ -3,6 +3,7 @@
 import type {
   Column,
   ColumnDef,
+  Row,
   RowData,
   RowSelectionState,
   TableOptions,
@@ -12,8 +13,13 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-import type { CSSProperties, ReactNode } from "react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  MoreHorizontal,
+} from "lucide-react";
+import type { CSSProperties, Key, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -65,9 +71,18 @@ export type DataTableColumnProps<
   pinned?: "left" | "right" | false;
 };
 
+export interface DataTableRowActionProps<TData extends RowData> {
+  key?: Key;
+  disabled?: boolean;
+  content: ReactNode;
+  onAction?: (row: Row<TData>) => Promise<void> | void;
+}
+
 export interface DataTableProps<TData extends RowData, TValue = unknown> {
   columns: Array<DataTableColumnProps<TData, TValue>>;
   data: Array<TData>;
+
+  rowActions?: (row: Row<TData>) => Array<DataTableRowActionProps<TData>>;
 
   pagination?: DataTablePaginationProps;
 
@@ -77,6 +92,8 @@ export interface DataTableProps<TData extends RowData, TValue = unknown> {
   bulkActions?: ReactNode;
 
   getRowId?: TableOptions<TData>["getRowId"];
+
+  onRowClick?: (row: Row<TData>) => void;
 }
 
 export function DataTable<TData extends RowData, TValue = unknown>({
@@ -94,13 +111,15 @@ export function DataTable<TData extends RowData, TValue = unknown>({
       ? row.id
       : index
     ).toString(),
+  rowActions,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const columnsWithSelection = useMemo(() => {
     return [
       ...(onRowSelectionChange
         ? [
             {
-              id: "select",
+              id: "$select",
               header: ({ table }) => (
                 <Checkbox
                   checked={
@@ -115,6 +134,7 @@ export function DataTable<TData extends RowData, TValue = unknown>({
               cell: ({ row }) => (
                 <Checkbox
                   checked={row.getIsSelected()}
+                  onClick={(e) => e.stopPropagation()}
                   onCheckedChange={(value) => row.toggleSelected(!!value)}
                 />
               ),
@@ -126,6 +146,47 @@ export function DataTable<TData extends RowData, TValue = unknown>({
           ]
         : []),
       ...columns,
+      ...(rowActions
+        ? [
+            {
+              id: "$actions",
+              header: () => null,
+              cell: ({ row }) => (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {rowActions(row).map((action, index) => (
+                      <DropdownMenuItem
+                        key={
+                          action.key ??
+                          (typeof action.content === "string"
+                            ? action.content
+                            : index)
+                        }
+                        disabled={action.disabled}
+                        {...(action.onAction
+                          ? {
+                              onClick: (e) => {
+                                e.stopPropagation();
+                                action.onAction?.(row);
+                              },
+                            }
+                          : {})}
+                      >
+                        {action.content}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ),
+              pinned: "right",
+            } satisfies DataTableColumnProps<TData, TValue>,
+          ]
+        : []),
     ];
   }, [columns, !!onRowSelectionChange]);
 
@@ -183,7 +244,7 @@ export function DataTable<TData extends RowData, TValue = unknown>({
 
   return (
     <div>
-      <div className="relative overflow-auto rounded-md border">
+      <div className="relative overflow-auto rounded-md">
         {/* batch actions */}
         {Object.keys(rowSelection).length > 0 && (
           <div className="bg-background absolute top-0 left-0 z-100 flex h-10 w-full items-center gap-2 px-2">
@@ -252,7 +313,7 @@ export function DataTable<TData extends RowData, TValue = unknown>({
                     <TableHead
                       key={header.id}
                       className={cn(
-                        "bg-background whitespace-normal",
+                        "whitespace-normal",
                         getCommonPinningClassNames<TData>(header.column),
                       )}
                       style={{
@@ -277,13 +338,16 @@ export function DataTable<TData extends RowData, TValue = unknown>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className={cn(onRowClick && "cursor-pointer")}
+                  {...(onRowClick ? { onClick: () => onRowClick?.(row) } : {})}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        "bg-background whitespace-normal",
+                        "whitespace-normal",
                         getCommonPinningClassNames<TData>(cell.column),
+                        cell.column.id === "$actions" && "text-right",
                       )}
                       style={{
                         ...getCommonPinningStyles<TData>(cell.column),

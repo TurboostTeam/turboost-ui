@@ -56,6 +56,27 @@ export const Default: Story = {
     onAllRowsSelectedChange: (selected) => {
       console.log("all rows selected", selected);
     },
+    onRowClick: (row) => {
+      console.log("row clicked", row);
+    },
+    rowActions: (row) => {
+      return [
+        {
+          key: "edit",
+          content: "Edit",
+          onAction: () => {
+            console.log("edit", row);
+          },
+        },
+        {
+          key: "delete",
+          content: "Delete",
+          onAction: () => {
+            console.log("delete", row);
+          },
+        },
+      ];
+    },
     columns: [
       { id: "name", header: "Name", size: 100, pinned: "left" },
       { id: "age", header: "Age", size: 100 },
